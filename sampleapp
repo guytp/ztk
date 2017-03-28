@@ -1,0 +1,2 @@
+#!/bin/bash
+dotnet Demos/SampleApp/bin/Debug/netcoreapp1.1/ztk-sampleapp.dll

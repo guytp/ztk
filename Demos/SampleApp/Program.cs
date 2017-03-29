@@ -18,7 +18,10 @@ namespace Ztk.Demos.SampleApp
         }
     }
 
+    // Window descends from container control and separates out Surface code so layout/measure same as other controls
+    // Layout also gets X/Y for children and stores all this, along with bounding rects, in a base class rather than bespoke implementations
     // Render controls
+    //    Layouts totally broken for various alignments (see Window sample for nested borders where auto isnt'w roking by default and 0 values being used)
     //    Border
     //      Corner Radius
     //      Mouse events - in base class
@@ -30,6 +33,7 @@ namespace Ztk.Demos.SampleApp
     //          Mouse events passed to children
     //          Nested grids test
     //    Button
+    //          On Hover / Pressed states and templates
     // Keyboard events
     // Focussed item for keyboard
     // TextBox

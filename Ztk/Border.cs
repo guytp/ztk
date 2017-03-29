@@ -79,15 +79,16 @@ namespace Ztk
                 g.Stroke();
             }
 
+            if (Child == null)
+                return;
+
             // Now draw the child
-            using (ImageSurface childSurface = new ImageSurface(Format.ARGB32, (int)Math.Round(Child.ActualWidth), (int)Math.Round(Child.ActualHeight)))
+            double width = ActualWidth - (2 * BorderThickness);
+            double height = ActualWidth - (2 * BorderThickness);
+            using (ImageSurface childSurface = new ImageSurface(Format.ARGB32, (int)Math.Round(width), (int)Math.Round(height)))
             {
                 using (GraphicsContext childContext = new GraphicsContext(childSurface))
                 {
-                    if (Child == null)
-                        return;
-                    double width = ActualWidth - (2 * BorderThickness);
-                    double height = ActualWidth - (2 * BorderThickness);
                     switch (Child.HorizontalAlignment)
                     {
                         case HorizontalAlignment.Stretch:

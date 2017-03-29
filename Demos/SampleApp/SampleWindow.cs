@@ -7,8 +7,123 @@ namespace Ztk.Demos.SampleApp
     {
         public SampleWindow()
         {
+            Background = new SolidColorBrush(new Color(0x2D / 255f, 0x2D / 255f, 0x30 / 255f));
+            Border mainBorder = new Border
+            {
+                BorderThickness = 1,
+                BorderBrush = Brushes.DodgerBlue,
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                VerticalAlignment = VerticalAlignment.Stretch,
+            };
+            Child = mainBorder;
+
+            Grid mainGrid = new Grid
+            {
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                VerticalAlignment = VerticalAlignment.Stretch,
+            };
+            mainBorder.Child = mainGrid;
+            mainGrid.ColumnDefinitions.Add(new ColumnDefinition(new GridLength(1, GridLengthType.Star)));
+            mainGrid.RowDefinitions.Add(new RowDefinition(new GridLength(3)));
+            mainGrid.RowDefinitions.Add(new RowDefinition(new GridLength(25)));
+            mainGrid.RowDefinitions.Add(new RowDefinition(new GridLength(3)));
+            mainGrid.RowDefinitions.Add(new RowDefinition(new GridLength(1, GridLengthType.Star)));
+            Border fillerBorder = new Border { Background = Brushes.DodgerBlue, HorizontalAlignment = HorizontalAlignment.Stretch, VerticalAlignment = VerticalAlignment.Stretch, BorderBrush = null, BorderThickness = 0 };
+            mainGrid.Children.Add(fillerBorder);
+            mainGrid.SetChildRow(fillerBorder, 0);
+            Border fillerBorder2 = new Border { Background = Brushes.DodgerBlue, HorizontalAlignment = HorizontalAlignment.Stretch, VerticalAlignment = VerticalAlignment.Stretch, BorderBrush = null, BorderThickness = 0 };
+            mainGrid.Children.Add(fillerBorder2);
+            mainGrid.SetChildRow(fillerBorder2, 2);
+            Grid titleGrid = new Grid
+            {
+                Background = Brushes.DodgerBlue,
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                VerticalAlignment = VerticalAlignment.Stretch,
+            };
+            mainGrid.Children.Add(titleGrid);
+            mainGrid.SetChildRow(titleGrid, 1);
+            titleGrid.RowDefinitions.Add(new RowDefinition(new GridLength(1, GridLengthType.Star)));
+            titleGrid.ColumnDefinitions.Add(new ColumnDefinition(new GridLength(60)));
+            titleGrid.ColumnDefinitions.Add(new ColumnDefinition(new GridLength(398)));
+            titleGrid.ColumnDefinitions.Add(new ColumnDefinition(new GridLength(60)));
+            titleGrid.ColumnDefinitions.Add(new ColumnDefinition(new GridLength(60)));
+            titleGrid.ColumnDefinitions.Add(new ColumnDefinition(new GridLength(60)));
+
+            TextBlock windowMenu = new TextBlock
+            {
+                Text = "  🐱  ",
+                FontSize = 22,
+                Foreground = Brushes.White,
+                VerticalAlignment = VerticalAlignment.Middle,
+                HorizontalAlignment = HorizontalAlignment.Middle
+            };
+            titleGrid.SetChildColumn(windowMenu, 0);
+            titleGrid.Children.Add(windowMenu);
+
+            TextBlock title = new TextBlock
+            {
+                Text = "Sample Application",
+                FontSize = 18,
+                Foreground = Brushes.White,
+                VerticalAlignment = VerticalAlignment.Middle,
+                HorizontalAlignment = HorizontalAlignment.Left
+            };
+            titleGrid.SetChildColumn(title, 1);
+            titleGrid.Children.Add(title);
+
+
+            TextBlock minimiseMenu = new TextBlock
+            {
+                Text = "  _  ",
+                FontSize = 22,
+                Foreground = Brushes.White,
+                VerticalAlignment = VerticalAlignment.Middle,
+                HorizontalAlignment = HorizontalAlignment.Middle
+            };
+            titleGrid.SetChildColumn(minimiseMenu, 2);
+            titleGrid.Children.Add(minimiseMenu);
+
+
+            TextBlock maximiseMenu = new TextBlock
+            {
+                Text = "  □  ",
+                FontSize = 22,
+                Foreground = Brushes.White,
+                VerticalAlignment = VerticalAlignment.Middle,
+                HorizontalAlignment = HorizontalAlignment.Middle
+            };
+            titleGrid.SetChildColumn(maximiseMenu, 3);
+            titleGrid.Children.Add(maximiseMenu);
+
+            TextBlock closeMenu = new TextBlock
+            {
+                Text = "  X  ",
+                FontSize = 22,
+                Foreground = Brushes.White,
+                VerticalAlignment = VerticalAlignment.Middle,
+                HorizontalAlignment = HorizontalAlignment.Middle
+            };
+            titleGrid.SetChildColumn(closeMenu, 4);
+            titleGrid.Children.Add(closeMenu);
+
+            TextBlock mainContentText = new TextBlock
+            {
+                FontSize = 24,
+                Text = "Main content would go here",
+                Foreground = Brushes.LimeGreen,
+                HorizontalAlignment = HorizontalAlignment.Middle,
+                VerticalAlignment = VerticalAlignment.Middle
+            };
+            mainGrid.SetChildRow(mainContentText, 3);
+            mainGrid.Children.Add(mainContentText);
+
+        }
+        public void OldSampleWindow()
+        {
             Background = new SolidColorBrush(new Color(0, 1, 0, 0.5));
             MouseLeftButtonDown += OnLeftButtonDown;
+
+
 
             Grid mainGrid = new Grid();
             mainGrid.RowDefinitions.Add(new RowDefinition(new GridLength(1, GridLengthType.Star)));

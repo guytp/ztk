@@ -1,4 +1,4 @@
-﻿namespace Ztk
+﻿namespace Ztk.Wayland
 {
     internal enum SharedMemoryFormat : uint
     {

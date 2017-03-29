@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Runtime.InteropServices;
 
-namespace Ztk
+namespace Ztk.Wayland
 {
     internal class Pointer : WaylandObject
     {
@@ -36,10 +36,6 @@ namespace Ztk
         private IntPtr _currentSurface = IntPtr.Zero;
         private double _currentSurfaceX;
         private double _currentSurfaceY;
-        #endregion
-
-        #region Properties
-        public uint Serial { get; private set; }
         #endregion
 
         public Pointer(IntPtr handle)
@@ -82,7 +78,6 @@ namespace Ztk
         {
             if (_currentSurface == IntPtr.Zero)
                 return;
-            Serial = serial;
             Window window = App.CurrentApplication.GetWindow(_currentSurface);
             window.TriggerMouseButton(button, state == 1, this, App.CurrentApplication.Seats.First(s => s.Pointer == this));
         }
@@ -127,7 +122,6 @@ namespace Ztk
             _currentSurface = surface;
             _currentSurfaceX = x;
             _currentSurfaceY = y;
-            Serial = serial;
         }
 
         private void OnLeaveListener(IntPtr data, IntPtr pointer, uint serial, IntPtr surface)
@@ -135,7 +129,6 @@ namespace Ztk
             Window oldWindow = App.CurrentApplication.GetWindow(surface);
             oldWindow.TriggerMouseLeave();
             _currentSurface = IntPtr.Zero;
-            Serial = serial;
         }
         #endregion
 

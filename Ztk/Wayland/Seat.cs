@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
-namespace Ztk
+namespace Ztk.Wayland
 {
     /// <summary>
     /// Represents a wayland seat.

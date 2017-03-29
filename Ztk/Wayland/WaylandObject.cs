@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Ztk
+namespace Ztk.Wayland
 {
     public abstract class WaylandObject : IDisposable
     {
@@ -12,6 +12,8 @@ namespace Ztk
 
         protected WaylandObject(IntPtr handle)
         {
+            if (handle == IntPtr.Zero)
+                throw new Exception("Failed to create " + GetType().Name + " Wayland object");
             Handle = handle;
         }
         ~WaylandObject()

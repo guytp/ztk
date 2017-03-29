@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using Ztk.Wayland;
 
 namespace Ztk
 {
@@ -24,7 +24,6 @@ namespace Ztk
         private readonly WaylandWrapperInterop.RegistryAnnounceListener _announceListener;
 
         private readonly WaylandWrapperInterop.RegistryRemoveListener _removeListener;
-        private readonly WaylandWrapperInterop.SharedMemoryFormatListener _sharedMemoryFormatListener;
         private readonly WaylandWrapperInterop.SeatCapabilitiesListener _seatCapabilitiesListener;
         private readonly WaylandWrapperInterop.SeatNameListener _seatNameListener;
 
@@ -42,7 +41,7 @@ namespace Ztk
         /// <summary>
         /// Gets the handle to the compositor.
         /// </summary>
-        internal IntPtr Compositor { get; private set; }
+        internal Compositor Compositor { get; private set; }
 
         /// <summary>
         /// Gets the handle to the shell.
@@ -52,7 +51,7 @@ namespace Ztk
         /// <summary>
         /// Gets a handle to the shared memory global object.
         /// </summary>
-        internal IntPtr SharedMemory { get; private set; }
+        internal SharedMemory SharedMemory { get; private set; }
 
         /// <summary>
         /// Gets a handle to the seat global object.
@@ -63,11 +62,6 @@ namespace Ztk
         /// Gets whether or not we have started yet.
         /// </summary>
         internal bool IsStarted { get; private set; }
-
-        /// <summary>
-        /// Gets the supported shared memory formats to this compositor.
-        /// </summary>
-        internal SharedMemoryFormat[] SharedMemoryFormats { get; private set; }
 
         internal List<Seat> Seats { get; private set; }
         #endregion
@@ -92,12 +86,10 @@ namespace Ztk
             // Setup app-wide delegates so that we do not lose references to them
             _removeListener = OnRegistryRemove;
             _announceListener = OnRegistryAnnounce;
-            _sharedMemoryFormatListener = OnSharedMemoryFormat;
             _seatCapabilitiesListener = OnSeatCapabilities;
             _seatNameListener = OnSeatName;
 
             // Ensure arrays are non-empty
-            SharedMemoryFormats = new SharedMemoryFormat[0];
             Seats = new List<Seat>();
 
             // Store initial window
@@ -141,13 +133,13 @@ namespace Ztk
             }
 
             // Ensure our compositor and shell interfaces
-            if (Compositor == IntPtr.Zero)
+            if (Compositor == null)
                 throw new Exception("Unable to get a handle to compositor");
             if (Shell == IntPtr.Zero)
                 throw new Exception("Unable to get a handle to shell");
-            if (SharedMemory == IntPtr.Zero)
+            if (SharedMemory == null)
                 throw new Exception("Unable to get a handle to shared memory");
-            if (SharedMemoryFormats.Length < 1)
+            if (!SharedMemory.SharedMemoryFormats.Contains(SharedMemoryFormat.ARGB8888))
                 throw new Exception("No supported shared memory formats with compositor");
             if (Seat == IntPtr.Zero)
                 throw new Exception("Unable to get a handle to seat");
@@ -199,7 +191,7 @@ namespace Ztk
         /// </returns>
         internal Window GetWindow(IntPtr surface)
         {
-            Window window = _windows.FirstOrDefault(w => w.Surface == surface);
+            Window window = _windows.FirstOrDefault(w => w._surface == surface);
             if (window == null)
                 throw new Exception("Unable to locate window for surface " + surface.ToHexString());
             return window;
@@ -216,15 +208,12 @@ namespace Ztk
         /// <param name="version"></param>
         void OnRegistryAnnounce(IntPtr data, IntPtr registry, uint id, string interfaceName, uint version)
         {
-            if (interfaceName == "wl_compositor" && Compositor == IntPtr.Zero)
-                Compositor = WaylandWrapperInterop.RegistryBindCompositor(registry, id);
+            if (interfaceName == "wl_compositor" && Compositor == null)
+                Compositor = new Compositor(WaylandWrapperInterop.RegistryBindCompositor(registry, id));
             else if (interfaceName == "wl_shell" && Shell == IntPtr.Zero)
                 Shell = WaylandWrapperInterop.RegistryBindShell(registry, id);
-            else if (interfaceName == "wl_shm" && SharedMemory == IntPtr.Zero)
-            {
-                SharedMemory = WaylandWrapperInterop.RegistryBindSharedMemory(registry, id);
-                WaylandWrapperInterop.SharedMemoryAddListeners(SharedMemory, _sharedMemoryFormatListener);
-            }
+            else if (interfaceName == "wl_shm" && SharedMemory == null)
+                SharedMemory = new SharedMemory(WaylandWrapperInterop.RegistryBindSharedMemory(registry, id));
             else if (interfaceName == "wl_seat" && Seat == IntPtr.Zero)
             {
                 Seat = WaylandWrapperInterop.RegistryBindSeat(registry, id);
@@ -257,22 +246,6 @@ namespace Ztk
 
             // Update the name
             seat.Name = name;
-        }
-
-        /// <summary>
-        /// Handle a new shared memory format being detected from the compositor.
-        /// </summary>
-        /// <param name="data"></param>
-        /// <param name="sharedMemory"></param>
-        /// <param name="format"></param>
-        private void OnSharedMemoryFormat(IntPtr data, IntPtr sharedMemory, SharedMemoryFormat format)
-        {
-            List<SharedMemoryFormat> sharedMemoryFormats = new List<SharedMemoryFormat>();
-            if (SharedMemoryFormats != null)
-                sharedMemoryFormats.AddRange(SharedMemoryFormats);
-            if (!sharedMemoryFormats.Contains(format))
-                sharedMemoryFormats.Add(format);
-            SharedMemoryFormats = sharedMemoryFormats.ToArray();
         }
 
         /// <summary>

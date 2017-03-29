@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Ztk
+namespace Ztk.Wayland
 {
     [Flags]
     public enum SeatCapability : uint

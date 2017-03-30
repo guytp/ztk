@@ -7,23 +7,20 @@ namespace Ztk.Wayland
     internal class Surface : WaylandObject
     {
         [DllImport("wayland-wrapper", EntryPoint = "wlw_surface_attach")]
-        public static extern void SurfaceAttach(IntPtr surface, IntPtr buffer);
+        private static extern void SurfaceAttach(IntPtr surface, IntPtr buffer);
 
         [DllImport("wayland-wrapper", EntryPoint = "wlw_surface_commit")]
-        public static extern void SurfaceCommit(IntPtr surface);
+        private static extern void SurfaceCommit(IntPtr surface);
         [DllImport("wayland-wrapper", EntryPoint = "wlw_surface_damage")]
 
-        public static extern void SurfaceDamage(IntPtr surface, int x, int y, int width, int height);
+        private static extern void SurfaceDamage(IntPtr surface, int x, int y, int width, int height);
 
         [DllImport("wayland-wrapper", EntryPoint = "wlw_surface_frame_listener")]
-        public static extern void SurfaceAddFrameListener(IntPtr surface, SurfaceFrameListener frameListener);
+        private static extern void SurfaceAddFrameListener(IntPtr surface, SurfaceFrameListener frameListener);
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate void SurfaceFrameListener(IntPtr data, IntPtr callback, uint callbackData);
+        private delegate void SurfaceFrameListener(IntPtr data, IntPtr callback, uint callbackData);
 
-        private int _width;
-
-        private int _height;
 
         private readonly SurfaceFrameListener _frameListener;
 
@@ -33,9 +30,7 @@ namespace Ztk.Wayland
 
         private Control _renderTarget;
 
-        private ShellSurface _shellSurface;
-
-        public SurfaceType SurfaceType { get; private set; }
+        public SurfaceType SurfaceType { get; protected set; }
 
         public Control RenderTarget
         {
@@ -49,8 +44,8 @@ namespace Ztk.Wayland
                 _renderTarget = value;
                 if (value != null)
                 {
-                    Size targetSize = value.MeasureDesiredSize(new Size(value.ActualWidth, value.ActualHeight));
-                    CreateBuffer((int)Math.Round(targetSize.Width), (int)Math.Round(targetSize.Height));
+                    CreateBuffer((int)Math.Round(value.ActualWidth), (int)Math.Round(value.ActualHeight));
+                    Size targetSize = value.MeasureDesiredSize(new Size(_buffer.Width, _buffer.Height));
                     value.SetActualSize(targetSize);
                 }
             }
@@ -61,13 +56,6 @@ namespace Ztk.Wayland
         {
             _frameListener = OnFrameListener;
             _sharedMemory = sharedMemory;
-        }
-
-        public void ConvertToShell()
-        {
-            if (SurfaceType != SurfaceType.Undefined)
-                throw new Exception("Cannot change surface type once defined");
-            _shellSurface = new ShellSurface(App.CurrentApplication.Shell.CreateShellSurface(this));
         }
 
         private void CreateBuffer(int width, int height)
@@ -87,28 +75,47 @@ namespace Ztk.Wayland
 
         private void OnFrameListener(IntPtr data, IntPtr callback, uint callbackData)
         {
+            PerformRenderingEventLoop();
         }
+
         private void PerformRenderingEventLoop()
         {
-            SurfaceDamage(Handle, 0, 0, _width, _height);
-            SurfaceAttach(Handle, _buffer.Handle);
-
-            if (RenderTarget != null)
+            if (_buffer != null)
             {
-                int pixels = _width * _height * 4;
-                using (ImageSurface imageSurface = new ImageSurface(Format.ARGB32, _width, _height))
-                {
-                    using (GraphicsContext g = new GraphicsContext(imageSurface))
-                    {
-                        RenderTarget.Render(g);
-                    }
-                    Marshal.Copy(imageSurface.Data, 0, _buffer.SharedMemoryPointer, imageSurface.Data.Length);
+                SurfaceDamage(Handle, 0, 0, _buffer.Width, _buffer.Height);
+                SurfaceAttach(Handle, _buffer.Handle);
 
+                if (RenderTarget != null)
+                {
+                    if (RenderTarget.HorizontalAlignment != HorizontalAlignment.Stretch || RenderTarget.VerticalAlignment != VerticalAlignment.Stretch)
+                        throw new Exception("Main render target must have dual stretch alignments");
+                    RenderTarget.MeasureDesiredSize(new Size(_buffer.Width, _buffer.Height));
+                    int pixels = _buffer.Width * _buffer.Stride;
+                    using (ImageSurface imageSurface = new ImageSurface(Format.ARGB32, _buffer.Width, _buffer.Height))
+                    {
+                        using (GraphicsContext g = new GraphicsContext(imageSurface))
+                        {
+                            if (RenderTarget.Opacity == 1)
+                                RenderTarget.Render(g);
+                            else if (RenderTarget.Opacity > 0)
+                                using (ImageSurface innerImageSurface = new ImageSurface(Format.ARGB32, _buffer.Width, _buffer.Height))
+                                {
+                                    using (GraphicsContext innerGraphics = new GraphicsContext(innerImageSurface))
+                                    {
+                                        RenderTarget.Render(innerGraphics);
+                                        g.SetSourceSurface(innerImageSurface, 0, 0);
+                                        g.PaintWithAlpha(RenderTarget.Opacity);
+                                    }
+                                }
+                        }
+                        Marshal.Copy(imageSurface.Data, 0, _buffer.SharedMemoryPointer, imageSurface.Data.Length);
+                    }
                 }
             }
-            SurfaceAddFrameListener(Handle, _frameListener);
-            SurfaceCommit(Handle);
-        }
 
+            SurfaceAddFrameListener(Handle, _frameListener);
+            if (_buffer != null)
+                SurfaceCommit(Handle);
+        }
     }
 }

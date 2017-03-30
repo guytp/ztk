@@ -1,7 +1,5 @@
-﻿using Ztk.Drawing;
-using System;
+﻿using System;
 using Ztk.Wayland;
-using WaylandSurface = Ztk.Wayland.Surface;
 
 namespace Ztk
 {
@@ -14,33 +12,38 @@ namespace Ztk
         private bool _isShown;
 
         /// <summary>
-        /// Defines a handle to the shell surface.
-        /// </summary>
-        private IntPtr _shellSurface;
-
-        private Control _currentMouseFocus;
-
-        private Pointer _lastButtonPointer;
-
-        private Seat _lastButtonSeat;
-
-        /// <summary>
         /// Gets a handle to the surface itself.
         /// </summary>
-        private WaylandSurface _surface;
+        private ShellSurface _surface;
+
+        private WaylandPointerButtonEventArgs _lastPointerButtonEventArgs;
         #endregion
 
-        #region Events
-        public event EventHandler MouseEnter;
-        public event EventHandler MouseLeave;
-        public event EventHandler<MouseMoveEventArgs> MouseMove;
-        public event EventHandler MouseLeftButtonDown;
-        public event EventHandler MouseLeftButtonUp;
-        public event EventHandler MouseRightButtonDown;
-        public event EventHandler MouseRightButtonUp;
-        public event EventHandler<MouseButtonEventArgs> MouseButtonDown;
-        public event EventHandler<MouseButtonEventArgs> MouseButtonUp;
-        #endregion
+        protected override FourSidedNumber InternalSpacing
+        {
+            get { return new FourSidedNumber(0); }
+        }
+        public override HorizontalAlignment HorizontalAlignment
+        {
+            get { return base.HorizontalAlignment; }
+            set
+            {
+                if (value != HorizontalAlignment.Stretch)
+                    throw new Exception("Window must have HorizontalAlignment set as Stretch");
+                base.HorizontalAlignment = value;
+            }
+        }
+
+        public override VerticalAlignment VerticalAlignment
+        {
+            get { return base.VerticalAlignment; }
+            set
+            {
+                if (value != VerticalAlignment.Stretch)
+                    throw new Exception("Window must have VerticalAlignment set as Stretch");
+                base.VerticalAlignment = value;
+            }
+        }
 
         #region Constructors
         /// <summary>
@@ -48,7 +51,10 @@ namespace Ztk
         /// </summary>
         public Window()
         {
+            HorizontalAlignment = HorizontalAlignment.Stretch;
+            VerticalAlignment = VerticalAlignment.Stretch;
             Background = Brushes.White;
+            SetActualSize(new Size(640, 480));
         }
         #endregion
 
@@ -64,117 +70,45 @@ namespace Ztk
             // Ensure application is running and if not start it although we are not resposible for the main loop
             if (App.CurrentApplication == null)
                 new App();
-            if (!App.CurrentApplication.IsStarted)
-                App.CurrentApplication.Startup();
+            App app = App.CurrentApplication;
+            if (!app.IsStarted)
+                app.Startup();
 
             // Create our surface and shell surfaces accordingly - we trust App is initialised correctly
-            _surface = App.CurrentApplication.Compositor.CreateSurface(App.CurrentApplication.SharedMemory);
-            _surface.ConvertToShell();
+            Registry registry = app.Registry;
+            _surface = registry.Compositor.CreateShellSurface(registry.SharedMemory, registry.Shell);
+            _surface.RenderTarget = this;
             _surface.StartRenderingEvents();
 
             // Mark as initialised
             _isShown = true;
-
-            // Inform the app of our surfaces
-            App.CurrentApplication.NotifyNewWindow(this);
         }
-
-        public override void Render(GraphicsContext g)
-        {
-            // Paint our background
-            PaintBackground(g, Background);
-
-            int zIndex = 0;
-            foreach (Control child in ChildrenInternal)
-            {
-                // Perform a measure pass on this child
-                double availableWidth = ActualWidth - Child.Margin.Left - Child.Margin.Right;
-                double availableHeight = ActualHeight - Child.Margin.Top - Child.Margin.Bottom;
-                Size desiredSize = Child.MeasureDesiredSize(new Size(ActualWidth, ActualHeight));
-                if (Child.VerticalAlignment == VerticalAlignment.Stretch)
-                    desiredSize.Height = availableHeight;
-                if (Child.HorizontalAlignment == HorizontalAlignment.Stretch)
-                    desiredSize.Width = availableWidth;
-                Child.SetActualSize(new Size(desiredSize.Width <= availableWidth ? desiredSize.Width : availableWidth, desiredSize.Height <= availableHeight ? desiredSize.Height : availableHeight));
-
-                // Now render the child
-                using (ImageSurface childSurface = new ImageSurface(Format.ARGB32, (int)Math.Round(Child.ActualWidth), (int)Math.Round(Child.ActualHeight)))
-                {
-                    using (GraphicsContext childContext = new GraphicsContext(childSurface))
-                    {
-                        double x;
-                        switch (Child.HorizontalAlignment)
-                        {
-                            case HorizontalAlignment.Stretch:
-                            case HorizontalAlignment.Left:
-                                x = Child.Margin.Left;
-                                break;
-                            case HorizontalAlignment.Right:
-                                x = ActualWidth - Child.Margin.Right - Child.ActualWidth;
-                                break;
-                            case HorizontalAlignment.Middle:
-                                x = (ActualWidth / 2) - ((Child.Margin.Left + Child.Margin.Right + Child.ActualWidth) / 2);
-                                break;
-                            default:
-                                throw new Exception("Unsupported horizontal alignment");
-                        }
-                        if (x < 0)
-                            x = 0;
-                        if (x > ActualWidth)
-                            x = ActualWidth;
-                        double y;
-                        switch (Child.VerticalAlignment)
-                        {
-                            case VerticalAlignment.Stretch:
-                            case VerticalAlignment.Top:
-                                y = Child.Margin.Top;
-                                break;
-                            case VerticalAlignment.Bottom:
-                                y = ActualHeight - Child.Margin.Bottom - Child.ActualHeight;
-                                break;
-                            case VerticalAlignment.Middle:
-                                y = (ActualHeight / 2) - ((Child.Margin.Top + Child.Margin.Bottom + Child.ActualHeight) / 2);
-                                break;
-                            default:
-                                throw new Exception("Unsupported vertical alignment");
-                        }
-
-                        if (y < 0)
-                            y = 0;
-                        if (y > ActualHeight)
-                            y = ActualHeight;
-                        Child.Render(childContext);
-                        g.SetSourceSurface(childSurface, (int)Math.Round(x), (int)Math.Round(y));
-                        g.PaintWithAlpha(Child.Opacity);
-                        LayoutInformation layoutInformation = GetLayoutInformationForChild(Child);
-                        layoutInformation.Rectangle = new Rectangle(x, y, Child.ActualWidth, Child.ActualHeight);
-                        layoutInformation.ZIndex = zIndex++;
-                    }
-                }
-            }
-
-        }
-
+        
 
         #region External Event Notification
         internal void TriggerMouseEnter(double x, double y)
         {
+            /*
             _currentMouseFocus?.TriggerMouseLeave();
             _currentMouseFocus = null;
             TriggerMouseMove(x, y);
             MouseEnter?.Invoke(this, new EventArgs());
+            */
         }
 
-        internal void TriggerMouseLeave()
+        internal void TriggerWaylandMouseLeave()
         {
+            /*
             if (_currentMouseFocus != null)
                 _currentMouseFocus.TriggerMouseLeave();
             MouseLeave?.Invoke(this, new EventArgs());
             _currentMouseFocus = null;
+            */
         }
 
-        internal void TriggerMouseMove(double x, double y)
+        internal void TriggerWaylandMouseMove(double x, double y)
         {
+            /*
             Control mouseControl = GetChildAtLocation(x, y);
 
             // If mouse focus has changed trigger appropriate mouse in/out events down the chain
@@ -196,13 +130,19 @@ namespace Ztk
             }
             else
                 MouseMove?.Invoke(this, new MouseMoveEventArgs(x, y));
+                */
         }
 
-        internal void TriggerMouseButton(MouseButton mouseButton, bool isDown, Pointer pointer, Seat seat)
+        internal void TriggerWaylandPointerButton(WaylandPointerButtonEventArgs e)
         {
+            // First store this as we need a reference if we want to enable certain things sucha s drag move
+            _lastPointerButtonEventArgs = e;
+
+            // Now convert this into a ZTK event and start it firing up the tree
+            /*
             if (_currentMouseFocus != null)
             {
-                _currentMouseFocus.TriggerMouseButton(mouseButton, isDown);
+                _currentMouseFocus.TriggerMouseButton(e.MouseButton, e.IsDown);
                 return;
             }
             if (isDown)
@@ -225,10 +165,9 @@ namespace Ztk
                 MouseRightButtonDown?.Invoke(this, new EventArgs());
             else if (mouseButton == MouseButton.Right && !isDown)
                 MouseRightButtonUp?.Invoke(this, new EventArgs());
+                */
         }
-
         #endregion
-
 
         protected void DragMove()
         {

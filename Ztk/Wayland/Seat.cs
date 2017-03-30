@@ -1,71 +1,70 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 
 namespace Ztk.Wayland
 {
-    /// <summary>
-    /// Represents a wayland seat.
-    /// </summary>
     internal class Seat : WaylandObject
     {
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate void SeatCapabilitiesListener(IntPtr data, IntPtr seatHandle, SeatCapability seatCapabilities);
 
-        private Pointer _pointer;
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+        private delegate void SeatNameListener(IntPtr data, IntPtr seatHandle, string name);
 
-        public string Name
-        {
-            get; set;
-        }
 
-        public Pointer Pointer
-        {
-            get
-            {
-                return _pointer;
-            }
-            private set
-            {
-                _pointer?.Dispose();
-                _pointer = value;
-            }
-        }
 
-        public List<SeatCapability> Capabilities { get; private set; }
+        [DllImport("wayland-wrapper", EntryPoint = "wlw_seat_add_listener")]
+        private static extern void SeatAddListeners(IntPtr seat, SeatCapabilitiesListener seatCapabilitiesListener, SeatNameListener seatNameListener);
+
+
+        private readonly SeatCapabilitiesListener _seatCapabilitiesListener;
+
+        private readonly SeatNameListener _seatNameListener;
+
+        public List<SeatInstance> Seats { get; private set; }
 
         public Seat(IntPtr handle)
             : base(handle)
         {
-            Capabilities = new List<SeatCapability>();
+            // Setup app-wide delegates so that we do not lose references to them
+            _seatCapabilitiesListener = OnSeatCapabilities;
+            _seatNameListener = OnSeatName;
+
+            Seats = new List<SeatInstance>();
+            SeatAddListeners(handle, _seatCapabilitiesListener, _seatNameListener);
         }
-
-        internal void UpdateCapabilities(SeatCapability seatCapabilities)
-        {
-            // Determine newly added capabilities - if pointer is added let's grab a handle to it
-            SeatCapability[] allFlags = new SeatCapability[] { SeatCapability.Keyboard, SeatCapability.Pointer, SeatCapability.Touch };
-            List<SeatCapability> newFlags = new List<SeatCapability>();
-            foreach (SeatCapability flag in allFlags)
-                if (seatCapabilities.HasFlag(flag) && !Capabilities.Contains(flag))
-                {
-                    Capabilities.Add(flag);
-                    newFlags.Add(flag);
-                }
-            if (newFlags.Contains(SeatCapability.Pointer))
-                Pointer = new Pointer(WaylandWrapperInterop.SeatPointerGet(Handle));
-
-            // Determine removed capabilities - if pointer is removed we must dispose of it
-            List<SeatCapability> removedFlags = new List<SeatCapability>();
-            foreach (SeatCapability flag in allFlags)
-                if (!seatCapabilities.HasFlag(flag) && Capabilities.Contains(flag))
-                {
-                    Capabilities.Remove(flag);
-                    removedFlags.Add(flag);
-                }
-            if (removedFlags.Contains(SeatCapability.Pointer))
-                Pointer = null;
-        }
-
         protected override void ReleaseWaylandObject()
         {
         }
+
+        private void OnSeatCapabilities(IntPtr data, IntPtr seatHandle, SeatCapability seatCapabilities)
+        {
+            // Get a handle to, or add, this seat
+            SeatInstance seat = Seats.FirstOrDefault(s => s.Handle == seatHandle);
+            if (seat == null)
+            {
+                seat = new SeatInstance(seatHandle);
+                Seats.Add(seat);
+            }
+
+            seat.UpdateCapabilities(seatCapabilities);
+        }
+
+        private void OnSeatName(IntPtr data, IntPtr seatHandle, string name)
+        {
+            // Get a handle to, or add, this seat
+            SeatInstance seat = Seats.FirstOrDefault(s => s.Handle == seatHandle);
+            if (seat == null)
+            {
+                seat = new SeatInstance(seatHandle);
+                Seats.Add(seat);
+            }
+
+            // Update the name
+            seat.Name = name;
+        }
+
     }
 }

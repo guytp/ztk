@@ -7,21 +7,21 @@ namespace Ztk.Wayland
     internal class SharedMemory : WaylandObject
     {
         [DllImport("wayland-wrapper", EntryPoint = "wlw_fd_allocate")]
-        public static extern int SharedMemoryFileDescriptorAllocate(int size);
+        private static extern int SharedMemoryFileDescriptorAllocate(int size);
 
 
         [DllImport("wayland-wrapper", EntryPoint = "wlw_shm_mmap")]
-        public static extern IntPtr SharedMemoryMap(int size, int fileDescriptor);
+        private static extern IntPtr SharedMemoryMap(int size, int fileDescriptor);
 
 
         [DllImport("wayland-wrapper", EntryPoint = "wlw_shm_pool_create")]
-        public static extern IntPtr SharedMemoryPoolCreate(IntPtr sharedMemory, int size, int fileDescriptor);
+        private static extern IntPtr SharedMemoryPoolCreate(IntPtr sharedMemory, int size, int fileDescriptor);
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate void SharedMemoryFormatListener(IntPtr data, IntPtr sharedMemory, SharedMemoryFormat format);
+        private delegate void SharedMemoryFormatListener(IntPtr data, IntPtr sharedMemory, SharedMemoryFormat format);
 
         [DllImport("wayland-wrapper", EntryPoint = "wlw_shm_add_listener")]
-        public static extern void SharedMemoryAddListeners(IntPtr sharedMemory, SharedMemoryFormatListener formatListener);
+        private static extern void SharedMemoryAddListeners(IntPtr sharedMemory, SharedMemoryFormatListener formatListener);
 
         private readonly SharedMemoryFormatListener _sharedMemoryFormatListener;
 
@@ -58,7 +58,7 @@ namespace Ztk.Wayland
 
             // Now create a pool for this shared memory
             SharedMemoryPool pool = new SharedMemoryPool(SharedMemoryPoolCreate(Handle, size, fileDescriptor));
-            return pool.CreateBuffer(sharedMemoryPointer, width, height, stride, sharedMemoryFormat);
+            return pool.CreateBuffer(width, height, stride, sharedMemoryFormat, sharedMemoryPointer);
         }
         /// <summary>
         /// Handle a new shared memory format being detected from the compositor.

@@ -30,5 +30,15 @@ namespace Ztk.Wayland
             ReleaseWaylandObject();
             _isDisposed = true;
         }
+
+        public override string ToString()
+        {
+            return Handle.ToHexString();
+        }
+
+        public override int GetHashCode()
+        {
+            return Handle.ToInt32();
+        }
     }
 }

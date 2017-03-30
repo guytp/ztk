@@ -5,7 +5,7 @@ namespace Ztk.Demos.SampleApp
 {
     public class SampleWindow : Window
     {
-        public SampleWindow()
+        public void OldSampleWindow()
         {
             Background = new SolidColorBrush(new Color(0x2D / 255f, 0x2D / 255f, 0x30 / 255f));
             Border mainBorder = new Border
@@ -118,7 +118,7 @@ namespace Ztk.Demos.SampleApp
             mainGrid.Children.Add(mainContentText);
 
         }
-        public void OldSampleWindow()
+        public void MoreOldSampleWindow()
         {
             Background = new SolidColorBrush(new Color(0, 1, 0, 0.5));
             MouseLeftButtonDown += OnLeftButtonDown;
@@ -202,6 +202,32 @@ namespace Ztk.Demos.SampleApp
                 VerticalAlignment = VerticalAlignment.Top
             };
             border.Child = tb;
+        }
+
+        public SampleWindow()
+        {
+            TextBlock textBlock = new TextBlock
+            {
+                Text = "This is a test",
+                Foreground = Brushes.LimeGreen,
+                Background = Brushes.Black,
+                Margin = new FourSidedNumber(5),
+                Padding = new FourSidedNumber(2),
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                VerticalAlignment = VerticalAlignment.Stretch
+            };
+            Border b = new Border
+            {
+                BorderThickness = 2,
+                BorderBrush = Brushes.Red,
+                Margin = new FourSidedNumber(10),
+                Background = Brushes.Gray,
+                Child = textBlock,
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                VerticalAlignment = VerticalAlignment.Stretch
+            };
+            Child = b;
+            Opacity = 0.5;
         }
 
         private void OnLeftButtonDown(object sender, EventArgs e)

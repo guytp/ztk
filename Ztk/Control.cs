@@ -10,13 +10,13 @@ namespace Ztk
 
         public double ActualHeight { get; private set; }
 
-        public double Opacity { get; internal set; }
+        public double Opacity { get; set; }
 
         public FourSidedNumber Margin { get; set; }
 
-        public HorizontalAlignment HorizontalAlignment { get; set; }
+        public virtual HorizontalAlignment HorizontalAlignment { get; set; }
 
-        public VerticalAlignment VerticalAlignment { get; set; }
+        public virtual VerticalAlignment VerticalAlignment { get; set; }
 
 
         #region Events

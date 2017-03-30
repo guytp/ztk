@@ -6,10 +6,10 @@ namespace Ztk.Wayland
     internal class SharedMemoryPool : WaylandObject
     {
         [DllImport("wayland-wrapper", EntryPoint = "wlw_shm_pool_buffer_create")]
-        public static extern IntPtr SharedMemoryPoolBufferCreate(IntPtr pool, int width, int height, int stride, SharedMemoryFormat sharedMemoryFormat);
+        private static extern IntPtr SharedMemoryPoolBufferCreate(IntPtr pool, int width, int height, int stride, SharedMemoryFormat sharedMemoryFormat);
 
         [DllImport("wayland-wrapper", EntryPoint = "wlw_shm_pool_destroy")]
-        public static extern void SharedMemoryPoolDestroy(IntPtr pool);
+        private static extern void SharedMemoryPoolDestroy(IntPtr pool);
 
         public SharedMemoryPool(IntPtr handle)
             : base(handle)
@@ -26,9 +26,9 @@ namespace Ztk.Wayland
             }
         }
 
-        internal Buffer CreateBuffer(IntPtr sharedMemoryPointer, int width, int height, int stride, SharedMemoryFormat sharedMemoryFormat)
+        internal Buffer CreateBuffer(int width, int height, int stride, SharedMemoryFormat sharedMemoryFormat, IntPtr sharedMemoryPointer)
         {
-            return new Buffer(SharedMemoryPoolBufferCreate(Handle, width, height, stride, sharedMemoryFormat), sharedMemoryPointer);
+            return new Buffer(SharedMemoryPoolBufferCreate(Handle, width, height, stride, sharedMemoryFormat), width, height, stride, sharedMemoryPointer);
         }
     }
 }

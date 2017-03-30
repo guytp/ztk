@@ -1,36 +1,44 @@
-﻿using System.Runtime.InteropServices;
+﻿using System;
+using System.Runtime.InteropServices;
 
 namespace Ztk.Wayland
 {
-    internal class ShellSurface : WaylandObject
+    internal class ShellSurface : Surface
     {
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate void ShellSurfacePingListener(IntPtr data, IntPtr shellSurface, uint serial);
+        private delegate void ShellSurfacePingListener(IntPtr data, IntPtr shellSurface, uint serial);
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate void ShellSurfaceConfigureListener(IntPtr data, IntPtr shellSurface, uint edges, int width, int height);
+        private delegate void ShellSurfaceConfigureListener(IntPtr data, IntPtr shellSurface, uint edges, int width, int height);
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate void ShellSurfacePopupDoneListener(IntPtr data, IntPtr shellSurface);
+        private delegate void ShellSurfacePopupDoneListener(IntPtr data, IntPtr shellSurface);
 
         [DllImport("wayland-wrapper", EntryPoint = "wlw_shell_surface_set_toplevel")]
-        public static extern void ShellSurfaceSetTopLevel(IntPtr shellSurface);
+        private static extern void ShellSurfaceSetTopLevel(IntPtr shellSurface);
 
 
         [DllImport("wayland-wrapper", EntryPoint = "wlw_shell_surface_add_listener")]
-        public static extern void ShellSurfaceAddListeners(IntPtr registry, ShellSurfacePingListener pingListener, ShellSurfaceConfigureListener configureListener, ShellSurfacePopupDoneListener popupDoneListener);
+        private static extern void ShellSurfaceAddListeners(IntPtr registry, ShellSurfacePingListener pingListener, ShellSurfaceConfigureListener configureListener, ShellSurfacePopupDoneListener popupDoneListener);
 
         [DllImport("wayland-wrapper", EntryPoint = "wlw_shell_surface_move")]
         private static extern void ShellSurfaceMove(IntPtr shellSurface, IntPtr seat, uint serial);
+
+
+        [DllImport("wayland-wrapper", EntryPoint = "wlw_shell_surface_pong")]
+        private static extern void ShellSurfacePong(IntPtr shellSurface, uint serial);
 
         private readonly ShellSurfacePingListener _surfacePingListener;
         private readonly ShellSurfaceConfigureListener _surfaceConfigureListener;
         private readonly ShellSurfacePopupDoneListener _surfacePopupDoneListener;
 
-        public ShellSurface(IntPtr handle)
-            : base(handle)
-        {
+        protected IntPtr ShellSurfaceHandle { get; private set; }
 
+        public ShellSurface(IntPtr handle, IntPtr surfaceHandle, SharedMemory sharedMemory)
+            : base(surfaceHandle, sharedMemory)
+        {
+            ShellSurfaceHandle = handle;
+            SurfaceType = SurfaceType.WaylandShell;
             _surfacePingListener = OnShellSurfacePing;
             _surfaceConfigureListener = OnShellSurfaceConfigure;
             _surfacePopupDoneListener = OnShellSurfacePopupDone;
@@ -38,25 +46,27 @@ namespace Ztk.Wayland
             ShellSurfaceAddListeners(handle, _surfacePingListener, _surfaceConfigureListener, _surfacePopupDoneListener);
         }
 
-        public void Move(PointerButtonEventArgs e)
+        public void Move(WaylandPointerButtonEventArgs e)
         {
-            ShellSurfaceMove(Handle, e.Seat.Handle, e.Pointer.Serial);
+            ShellSurfaceMove(ShellSurfaceHandle, e.Seat.Handle, e.Serial);
         }
 
         #region Event Handlers
         private void OnShellSurfacePopupDone(IntPtr data, IntPtr shellSurface)
         {
-            Console.Write("Popup done for window");
         }
 
         private void OnShellSurfaceConfigure(IntPtr data, IntPtr shellSurface, uint edges, int width, int height)
         {
-            Console.WriteLine("Window configure hint to " + edges + " / " + width + " / " + height);
         }
 
         private void OnShellSurfacePing(IntPtr data, IntPtr shellSurface, uint serial)
         {
-            WaylandWrapperInterop.ShellSurfacePong(shellSurface, serial);
+            ShellSurfacePong(shellSurface, serial);
+        }
+
+        protected override void ReleaseWaylandObject()
+        {
         }
         #endregion
     }

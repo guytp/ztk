@@ -37,7 +37,8 @@ namespace Ztk.Demos.SampleApp
     // Window startup maximise/normal/full screen
     // Resize window
 
-
+    // Buttons can have flat style and can be font configurable
+    // Can define fixed Width/Height (NaA means ignore).  Stretch still takes prescedence.  Apply to whole stack including window.
     // calculator sample app
     // Set window Title / class / etc.
     // Correctly destroy all wl_ objects and encapsulate in WaylandObject classes

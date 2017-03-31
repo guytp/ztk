@@ -5,6 +5,8 @@
     <TargetFramework>netcoreapp1.1</TargetFramework>
     <AssemblyName>ztk-sampleapp</AssemblyName>
     <RootNamespace>Ztk.Demos.SampleApp</RootNamespace>
+    <PreBuildEvent></PreBuildEvent>
+    <PostBuildEvent>cmd /c "d:\code\ztkup.bat"</PostBuildEvent>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

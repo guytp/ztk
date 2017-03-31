@@ -35,7 +35,12 @@ namespace Ztk
             Size desiredSize = Text.GetSize(FontFamily, FontSize, FontSlant, FontWeight);
             double desiredHeight = desiredSize.Height + Padding.Top + Padding.Bottom;
             double desiredWidth = desiredSize.Width + Padding.Left + Padding.Right;
-            return new Size(desiredWidth <= availableSize.Width ? desiredWidth : availableSize.Width, desiredHeight <= availableSize.Height ? desiredHeight : availableSize.Height);
+            Size newSize = new Size(desiredWidth <= availableSize.Width ? desiredWidth : availableSize.Width, desiredHeight <= availableSize.Height ? desiredHeight : availableSize.Height);
+            if (HorizontalAlignment == HorizontalAlignment.Stretch)
+                newSize.Width = availableSize.Width;
+            if (VerticalAlignment == VerticalAlignment.Stretch)
+                newSize.Height = availableSize.Height;
+            return newSize;
         }
 
         public override void Render(GraphicsContext g)
@@ -48,7 +53,6 @@ namespace Ztk
             Foreground.ApplyBrushToContext(g);
             g.SelectFontFace(FontFamily, FontSlant, FontWeight);
             g.SetFontSize(FontSize);
-            FontExtents fe = g.FontExtents;
             TextExtents te = g.TextExtents(Text);
             g.MoveTo(te.XBearing * -1 + Padding.Left, te.YBearing * -1 + Padding.Top);
             g.ShowText(Text);

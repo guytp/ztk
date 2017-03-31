@@ -8,14 +8,8 @@ namespace Ztk
     {
         public Brush Background { get; set; }
 
-        protected List<Control> ChildrenInternal { get; private set; }
-
-        private List<LayoutInformation> LayoutInformation { get; set; }
-
         protected BaseContainerControl()
         {
-            LayoutInformation = new List<LayoutInformation>();
-            ChildrenInternal = new List<Control>();
         }
 
         protected LayoutInformation GetLayoutInformationForChild(Control child)

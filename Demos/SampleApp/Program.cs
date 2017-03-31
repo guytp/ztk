@@ -18,6 +18,7 @@ namespace Ztk.Demos.SampleApp
         }
     }
 
+    // "Click" and "Double Click" events - needs button tracking better as a MouseState object
 
     // Layouts totally broken for various alignments (see Window sample for nested borders where auto isnt'w roking by default and 0 values being used)
     // Border
@@ -29,12 +30,7 @@ namespace Ztk.Demos.SampleApp
     //    Mouse events passed to children
     //    Nested grids test
 
-
-    // Add back mouse events and structure to propogate through all nested controls.  Add to buttont oo.
-    // "Click" and "Double Click" events - needs button tracking better as a MouseState object
     // Keyboard events
-
-
     // Focussed item for keyboard - controls can opt to not have keyboard focus
     // TextBox
 

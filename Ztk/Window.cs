@@ -15,8 +15,6 @@ namespace Ztk
         /// Gets a handle to the surface itself.
         /// </summary>
         private ShellSurface _surface;
-
-        private WaylandPointerButtonEventArgs _lastPointerButtonEventArgs;
         #endregion
 
         protected override FourSidedNumber InternalSpacing
@@ -84,95 +82,10 @@ namespace Ztk
             _isShown = true;
         }
         
-
-        #region External Event Notification
-        internal void TriggerMouseEnter(double x, double y)
-        {
-            /*
-            _currentMouseFocus?.TriggerMouseLeave();
-            _currentMouseFocus = null;
-            TriggerMouseMove(x, y);
-            MouseEnter?.Invoke(this, new EventArgs());
-            */
-        }
-
-        internal void TriggerWaylandMouseLeave()
-        {
-            /*
-            if (_currentMouseFocus != null)
-                _currentMouseFocus.TriggerMouseLeave();
-            MouseLeave?.Invoke(this, new EventArgs());
-            _currentMouseFocus = null;
-            */
-        }
-
-        internal void TriggerWaylandMouseMove(double x, double y)
-        {
-            /*
-            Control mouseControl = GetChildAtLocation(x, y);
-
-            // If mouse focus has changed trigger appropriate mouse in/out events down the chain
-            if (mouseControl != _currentMouseFocus)
-            {
-                // If old control was not null then it needs a leave event
-                _currentMouseFocus?.TriggerMouseLeave();
-
-                // If new control is not null then trigger a mouse enter
-                mouseControl?.TriggerMouseEnter();
-
-                // Store this as the current focus
-                _currentMouseFocus = mouseControl;
-            }
-            if (_currentMouseFocus != null)
-            {
-                Rectangle childRectangle = GetLayoutInformationForChild(Child).Rectangle;
-                _currentMouseFocus.TriggerMouseMove(x - childRectangle.X, y - childRectangle.Y);
-            }
-            else
-                MouseMove?.Invoke(this, new MouseMoveEventArgs(x, y));
-                */
-        }
-
-        internal void TriggerWaylandPointerButton(WaylandPointerButtonEventArgs e)
-        {
-            // First store this as we need a reference if we want to enable certain things sucha s drag move
-            _lastPointerButtonEventArgs = e;
-
-            // Now convert this into a ZTK event and start it firing up the tree
-            /*
-            if (_currentMouseFocus != null)
-            {
-                _currentMouseFocus.TriggerMouseButton(e.MouseButton, e.IsDown);
-                return;
-            }
-            if (isDown)
-            {
-                _lastButtonPointer = pointer;
-                _lastButtonSeat = seat;
-                MouseButtonDown?.Invoke(this, new MouseButtonEventArgs(mouseButton));
-            }
-            else
-            {
-                _lastButtonPointer = null;
-                _lastButtonSeat = null;
-                MouseButtonUp?.Invoke(this, new MouseButtonEventArgs(mouseButton));
-            }
-            if (mouseButton == MouseButton.Left && isDown)
-                MouseLeftButtonDown?.Invoke(this, new EventArgs());
-            else if (mouseButton == MouseButton.Left && !isDown)
-                MouseLeftButtonUp?.Invoke(this, new EventArgs());
-            else if (mouseButton == MouseButton.Right && isDown)
-                MouseRightButtonDown?.Invoke(this, new EventArgs());
-            else if (mouseButton == MouseButton.Right && !isDown)
-                MouseRightButtonUp?.Invoke(this, new EventArgs());
-                */
-        }
-        #endregion
-
         protected void DragMove()
         {
-            if (_lastPointerButtonEventArgs != null)
-                _surface.Move(_lastPointerButtonEventArgs);
+            if (LastPointerButtonEventArgs != null)
+                _surface.Move(LastPointerButtonEventArgs);
         }
     }
 }

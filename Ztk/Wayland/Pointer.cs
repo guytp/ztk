@@ -83,9 +83,9 @@ namespace Ztk.Wayland
         {
             if (_currentSurface == IntPtr.Zero)
                 return;
-            Window window = GetWindow(_currentSurface);
+            Control window = GetControlForSurface(_currentSurface);
             SeatInstance seat = App.CurrentApplication.Registry.Seat.Seats.First(s => s.Pointer == this);
-            window.TriggerWaylandPointerButton(new WaylandPointerButtonEventArgs(this, seat, serial, button, state == 1));
+            window.TriggerWaylandPointerButton(new WaylandPointerButtonEventArgs(this, seat, serial, button, state == 1, _currentSurfaceX, _currentSurfaceY));
         }
 
         private void OnMotionListener(IntPtr data, IntPtr pointer, uint time, int surfaceX, int surfaceY)
@@ -96,7 +96,7 @@ namespace Ztk.Wayland
 
             if (_currentSurface != IntPtr.Zero)
             {
-                Window window = GetWindow(_currentSurface);
+                Control window = GetControlForSurface(_currentSurface);
                 window.TriggerWaylandMouseMove(x, y);
             }
 
@@ -112,7 +112,7 @@ namespace Ztk.Wayland
         {
             if (_currentSurface != IntPtr.Zero)
             {
-                Window oldWindow = GetWindow(_currentSurface);
+                Control oldWindow = GetControlForSurface(_currentSurface);
                 oldWindow.TriggerWaylandMouseLeave();
             }
 
@@ -121,8 +121,8 @@ namespace Ztk.Wayland
             double y = FixedToDouble(surfaceY);
 
             // Notify new window we have entered
-            Window newWindow = GetWindow(surface);
-            newWindow.TriggerMouseEnter(x, y);
+            Control newWindow = GetControlForSurface(surface);
+            newWindow.TriggerWaylandMouseEnter(x, y);
 
             // Store new value
             _currentSurface = surface;
@@ -132,7 +132,7 @@ namespace Ztk.Wayland
 
         private void OnLeaveListener(IntPtr data, IntPtr pointer, uint serial, IntPtr surface)
         {
-            Window oldWindow = GetWindow(surface);
+            Control oldWindow = GetControlForSurface(surface);
             oldWindow.TriggerWaylandMouseLeave();
             _currentSurface = IntPtr.Zero;
         }
@@ -147,9 +147,9 @@ namespace Ztk.Wayland
             }
         }
 
-        private Window GetWindow(IntPtr surfaceHandle)
+        private Control GetControlForSurface(IntPtr surfaceHandle)
         {
-            return App.CurrentApplication.Registry?.Compositor?.SurfaceForHandle(surfaceHandle)?.RenderTarget as Window;
+            return App.CurrentApplication.Registry?.Compositor?.SurfaceForHandle(surfaceHandle)?.RenderTarget;
         }
     }
 }

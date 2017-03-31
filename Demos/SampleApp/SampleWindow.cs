@@ -206,6 +206,7 @@ namespace Ztk.Demos.SampleApp
 
         public SampleWindow()
         {
+            MouseLeftButtonDown += OnLeftButtonDown;
             Button btn = new Button
             {
                 Content = "This is a test",
@@ -213,6 +214,7 @@ namespace Ztk.Demos.SampleApp
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 VerticalAlignment = VerticalAlignment.Stretch
             };
+            btn.MouseLeftButtonDown += OnMouseLeftButtonDown;
             Border b = new Border
             {
                 BorderThickness = 2,
@@ -224,6 +226,11 @@ namespace Ztk.Demos.SampleApp
                 VerticalAlignment = VerticalAlignment.Stretch
             };
             Child = b;
+        }
+
+        private void OnMouseLeftButtonDown(object sender, EventArgs e)
+        {
+            Console.WriteLine("Button clicked!");
         }
 
         private void OnLeftButtonDown(object sender, EventArgs e)

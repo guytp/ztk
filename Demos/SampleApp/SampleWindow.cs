@@ -206,13 +206,10 @@ namespace Ztk.Demos.SampleApp
 
         public SampleWindow()
         {
-            TextBlock textBlock = new TextBlock
+            Button btn = new Button
             {
-                Text = "This is a test",
-                Foreground = Brushes.LimeGreen,
-                Background = Brushes.Black,
-                Margin = new FourSidedNumber(5),
-                Padding = new FourSidedNumber(2),
+                Content = "This is a test",
+                Margin = new FourSidedNumber(15),
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 VerticalAlignment = VerticalAlignment.Stretch
             };
@@ -222,12 +219,11 @@ namespace Ztk.Demos.SampleApp
                 BorderBrush = Brushes.Red,
                 Margin = new FourSidedNumber(10),
                 Background = Brushes.Gray,
-                Child = textBlock,
+                Child = btn,
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 VerticalAlignment = VerticalAlignment.Stretch
             };
             Child = b;
-            Opacity = 0.5;
         }
 
         private void OnLeftButtonDown(object sender, EventArgs e)

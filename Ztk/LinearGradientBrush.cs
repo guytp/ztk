@@ -30,7 +30,7 @@ namespace Ztk
             {
                 double actualWidth = surface.Width;
                 double actualHeight = surface.Height;
-                using (LinearGradient lg = new LinearGradient(X0, Y0, X1 * actualWidth, Y1 * actualHeight))
+                using (LinearGradient lg = new LinearGradient(X0 * actualWidth, Y0 * actualHeight, X1 * actualWidth, Y1 * actualHeight))
                 {
                     if (GradientStops != null)
                         foreach (GradientStop gs in GradientStops)

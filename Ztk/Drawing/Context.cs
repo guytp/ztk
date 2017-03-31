@@ -53,6 +53,32 @@ namespace Ztk.Drawing {
 
 		static int native_glyph_size, c_compiler_long_size;
 
+        public void RoundedRect(double x, double y, double width, double height, double radius, Brush background, Brush borderBrush, double borderThickness)
+        {
+
+            double degrees = Math.PI / 180;
+            NewSubPath();
+            Arc(x + width - radius, y + radius, radius, -90 * degrees, 0 * degrees);
+            Arc(x + width - radius, y + height - radius, radius, 0 * degrees, 90 * degrees);
+            Arc(x + radius, y + height - radius, radius, 90 * degrees, 180 * degrees);
+            Arc(x + radius, y + radius, radius, 180 * degrees, 270 * degrees);
+            ClosePath();
+
+
+            if (background != null)
+            {
+                background.ApplyBrushToContext(this);
+                FillPreserve();
+            }
+            if (borderBrush != null)
+            {
+                LineWidth = borderThickness + 1;
+                borderBrush.ApplyBrushToContext(this);
+                Stroke();
+            }
+
+        }
+
 		static GraphicsContext ()
 		{
 			//

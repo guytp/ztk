@@ -18,7 +18,7 @@ namespace Ztk.Demos.SampleApp
         }
     }
 
-    // TextBlock - sort out measure/render to cope with Stretch in new model - test all combinations in current SampleWindow
+
     // Layouts totally broken for various alignments (see Window sample for nested borders where auto isnt'w roking by default and 0 values being used)
     // Border
     //   Stretching width/height overlaps entire parent grid somehow
@@ -28,25 +28,27 @@ namespace Ztk.Demos.SampleApp
     //    * widths not perfect if * + an auto (some unused space) - or is this margins?
     //    Mouse events passed to children
     //    Nested grids test
-    // Add back mouse events and structure to propogate through all nested controls
 
-    // Button
+
+    // Add back mouse events and structure to propogate through all nested controls.  Add to buttont oo.
+    // "Click" and "Double Click" events - needs button tracking better as a MouseState object
     // Keyboard events
+
+
     // Focussed item for keyboard - controls can opt to not have keyboard focus
     // TextBox
 
     // use xdg shell
+    // Window Decorations (include maximise / full-screen) - configurable
+    // Window startup maximise/normal/full screen
+    // Resize window
+
+
     // calculator sample app
     // Set window Title / class / etc.
     // Correctly destroy all wl_ objects and encapsulate in WaylandObject classes
 
-    // Window Decorations (include maximise / full-screen) - configurable
-    // Window startup maximise/normal/full screen
-    // Resize window
-    
     // Multi-window support (callback objects not static in C code)
-
-    // "Click" and "Double Click" events - needs button tracking better as a MouseState object
 
     // Data binding
     // Styles/themes
@@ -56,6 +58,8 @@ namespace Ztk.Demos.SampleApp
     // All UI components implement INotifyPropertyChanged
     // Implement a render is required / layout is required / only re-composite changed areas model - trigger renders required when any changes made to properties - store last used buffers (or just write alpha over?)
 
+    // BUtton/TB add horizontal/vertical content alignment
+    // Button content presenter?
     // Image (via ImageBrush)
     // Radio Button
     // Check Box

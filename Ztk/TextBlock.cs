@@ -36,6 +36,13 @@ namespace Ztk
             double desiredHeight = desiredSize.Height + Padding.Top + Padding.Bottom;
             double desiredWidth = desiredSize.Width + Padding.Left + Padding.Right;
             Size newSize = new Size(desiredWidth <= availableSize.Width ? desiredWidth : availableSize.Width, desiredHeight <= availableSize.Height ? desiredHeight : availableSize.Height);
+
+            // Ensure we are within bounds
+            if (newSize.Width > availableSize.Width)
+                newSize.Width = availableSize.Width;
+            if (newSize.Height > availableSize.Height)
+                newSize.Height = availableSize.Height;
+
             if (HorizontalAlignment == HorizontalAlignment.Stretch)
                 newSize.Width = availableSize.Width;
             if (VerticalAlignment == VerticalAlignment.Stretch)

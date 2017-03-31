@@ -227,6 +227,95 @@ namespace Ztk.Demos.SampleApp
             Child = b;
         }
 
+        public void CalculatorampleWindow()
+        {
+            Background = Brushes.Black;
+            Grid mainGrid = new Grid
+            {
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                VerticalAlignment = VerticalAlignment.Stretch,
+            };
+            Child = mainGrid;
+            mainGrid.RowDefinitions.Add(new RowDefinition(new GridLength()));
+            mainGrid.RowDefinitions.Add(new RowDefinition(new GridLength()));
+            mainGrid.RowDefinitions.Add(new RowDefinition(new GridLength(1, GridLengthType.Star)));
+            mainGrid.ColumnDefinitions.Add(new ColumnDefinition());
+
+            TextBlock trackerText = new TextBlock
+            {
+                Text = "1 + ",
+                Foreground = Brushes.LightGray,
+                FontSize = 8,
+                HorizontalAlignment = HorizontalAlignment.Right,
+                Margin = new FourSidedNumber(5)
+            };
+            mainGrid.Children.Add(trackerText);
+            mainGrid.SetChildColumn(trackerText, 0);
+            mainGrid.SetChildRow(trackerText, 0);
+
+
+            TextBlock inputText = new TextBlock
+            {
+                Text = "123",
+                Foreground = Brushes.White,
+                FontSize = 32,
+                FontWeight = FontWeight.Bold,
+                HorizontalAlignment = HorizontalAlignment.Right,
+                Margin = new FourSidedNumber(5)
+            };
+            mainGrid.Children.Add(inputText);
+            mainGrid.SetChildColumn(inputText, 0);
+            mainGrid.SetChildRow(inputText, 1);
+
+            Grid buttonsGrid = new Grid
+            {
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                VerticalAlignment = VerticalAlignment.Stretch,
+            };
+            buttonsGrid.RowDefinitions.Add(new RowDefinition(new GridLength(1, GridLengthType.Star)));
+            buttonsGrid.RowDefinitions.Add(new RowDefinition(new GridLength(1, GridLengthType.Star)));
+            buttonsGrid.RowDefinitions.Add(new RowDefinition(new GridLength(1, GridLengthType.Star)));
+            buttonsGrid.RowDefinitions.Add(new RowDefinition(new GridLength(1, GridLengthType.Star)));
+            buttonsGrid.RowDefinitions.Add(new RowDefinition(new GridLength(1, GridLengthType.Star)));
+            buttonsGrid.ColumnDefinitions.Add(new ColumnDefinition(new GridLength(1, GridLengthType.Star)));
+            buttonsGrid.ColumnDefinitions.Add(new ColumnDefinition(new GridLength(1, GridLengthType.Star)));
+            buttonsGrid.ColumnDefinitions.Add(new ColumnDefinition(new GridLength(1, GridLengthType.Star)));
+            buttonsGrid.ColumnDefinitions.Add(new ColumnDefinition(new GridLength(1, GridLengthType.Star)));
+            mainGrid.Children.Add(buttonsGrid);
+            mainGrid.SetChildColumn(buttonsGrid, 0);
+            mainGrid.SetChildRow(buttonsGrid, 2);
+
+            string[] buttons = new[] { "CE", "^2", "sqrt", "/", "7", "8", "9", "X", "4", "5", "6", "-", "1", "2", "3", "+", "+-", "0", ".", "=" };
+            int row = 0;
+            int column = 0;
+            for (int i = 0; i < buttons.Length; i++)
+            {
+                if (column == 4)
+                {
+                    row++;
+                    column = 0;
+                }
+
+                Button b = new Button
+                {
+                    Content = buttons[i],
+                    HorizontalAlignment = HorizontalAlignment.Stretch,
+                    VerticalAlignment = VerticalAlignment.Stretch
+                };
+                buttonsGrid.Children.Add(b);
+                buttonsGrid.SetChildColumn(b, column);
+                buttonsGrid.SetChildRow(b, row);
+                b.Click += CalculatorButtonOnClick;
+
+                column++;
+            }
+
+        }
+
+        private void CalculatorButtonOnClick(object sender, EventArgs e)
+        {
+            Console.WriteLine(((Button)sender).Content + " clicked");
+        }
 
         private void OnMouseLeftButtonDown(object sender, EventArgs e)
         {

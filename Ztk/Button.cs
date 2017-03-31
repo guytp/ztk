@@ -1,10 +1,13 @@
-﻿using Ztk.Drawing;
+﻿using System;
+using Ztk.Drawing;
 
 namespace Ztk
 {
     public class Button : Control
     {
         private static Brush _backgroundBrush;
+
+        private readonly ClickStateTracker _clickStateTracker;
 
         public object Content { get; set; }
 
@@ -20,11 +23,27 @@ namespace Ztk
             });
         }
 
+        public event EventHandler Click;
+        public event EventHandler DoubleClick;
+
         public Button()
         {
             VerticalAlignment = VerticalAlignment.Top;
             HorizontalAlignment = HorizontalAlignment.Left;
             Padding = new FourSidedNumber(10, 5, 10, 5);
+            _clickStateTracker = new ClickStateTracker(this);
+            _clickStateTracker.Click += OnClick;
+            _clickStateTracker.DoubleClick += OnDoubleClick;
+        }
+
+        private void OnClick(object sender, EventArgs e)
+        {
+            Click?.Invoke(this, new EventArgs());
+        }
+
+        private void OnDoubleClick(object sender, EventArgs e)
+        {
+            DoubleClick?.Invoke(this, new EventArgs());
         }
 
         public override Size MeasureDesiredSize(Size availableSize)

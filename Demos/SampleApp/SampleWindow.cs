@@ -118,7 +118,7 @@ namespace Ztk.Demos.SampleApp
             mainGrid.Children.Add(mainContentText);
 
         }
-        public void MoreOldSampleWindow()
+        public void GridsSampleWindow()
         {
             Background = new SolidColorBrush(new Color(0, 1, 0, 0.5));
             MouseLeftButtonDown += OnLeftButtonDown;
@@ -133,7 +133,6 @@ namespace Ztk.Demos.SampleApp
             mainGrid.Background = Brushes.RosyBrown;
             Child = mainGrid;
 
-            /*
             Grid gridTop = new Grid();
             mainGrid.Children.Add(gridTop);
             mainGrid.SetChildRow(gridTop, 0);
@@ -146,7 +145,6 @@ namespace Ztk.Demos.SampleApp
             gridTop.VerticalAlignment = VerticalAlignment.Stretch;
             gridTop.Background = Brushes.OrangeRed;
             gridTop.Margin = new FourSidedNumber(20);
-            */
 
             TextBlock tbTop = new TextBlock
             {
@@ -157,7 +155,6 @@ namespace Ztk.Demos.SampleApp
             mainGrid.Children.Add(tbTop);
             mainGrid.SetChildColumn(tbTop, 0);
             mainGrid.SetChildRow(tbTop, 0);
-            /*
             Random rand = new Random();
             for (int row = 0; row < gridTop.RowDefinitions.Count; row++)
                 for (int column = 0; column < gridTop.ColumnDefinitions.Count; column++)
@@ -177,7 +174,6 @@ namespace Ztk.Demos.SampleApp
                     gridTop.SetChildRow(textBlock, row);
                     gridTop.SetChildColumn(textBlock, column);
                 }
-                */
 
             // Now add a border in bottom half of screen
             Border border = new Border
@@ -211,10 +207,13 @@ namespace Ztk.Demos.SampleApp
             {
                 Content = "This is a test",
                 Margin = new FourSidedNumber(15),
-                HorizontalAlignment = HorizontalAlignment.Stretch,
-                VerticalAlignment = VerticalAlignment.Stretch
+                HorizontalAlignment = HorizontalAlignment.Middle,
+                VerticalAlignment = VerticalAlignment.Middle
             };
             btn.MouseLeftButtonDown += OnMouseLeftButtonDown;
+            btn.MouseLeftButtonUp += OnMouseLeftButtonUp;
+            btn.Click += OnClick;
+            btn.DoubleClick += OnDoubleClick;
             Border b = new Border
             {
                 BorderThickness = 2,
@@ -228,9 +227,22 @@ namespace Ztk.Demos.SampleApp
             Child = b;
         }
 
+
         private void OnMouseLeftButtonDown(object sender, EventArgs e)
         {
+            Console.WriteLine("Mouse down!");
+        }
+        private void OnMouseLeftButtonUp(object sender, EventArgs e)
+        {
+            Console.WriteLine("Mouse up!");
+        }
+        private void OnClick(object sender, EventArgs e)
+        {
             Console.WriteLine("Button clicked!");
+        }
+        private void OnDoubleClick(object sender, EventArgs e)
+        {
+            Console.WriteLine("Double click!");
         }
 
         private void OnLeftButtonDown(object sender, EventArgs e)

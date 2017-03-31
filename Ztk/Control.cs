@@ -119,17 +119,17 @@ namespace Ztk
 
             // Now trigger the mouse event in non-Wayland terms in there
             if (e.IsButtonDown)
-                MouseButtonDown?.Invoke(this, new MouseButtonEventArgs(mouseButton));
+                visualChild.MouseButtonDown?.Invoke(this, new MouseButtonEventArgs(mouseButton));
             else
-                MouseButtonUp?.Invoke(this, new MouseButtonEventArgs(mouseButton));
+                visualChild.MouseButtonUp?.Invoke(this, new MouseButtonEventArgs(mouseButton));
             if (mouseButton == MouseButton.Left && e.IsButtonDown)
                 visualChild.MouseLeftButtonDown?.Invoke(this, new EventArgs());
             else if (mouseButton == MouseButton.Left && !e.IsButtonDown)
-                MouseLeftButtonUp?.Invoke(this, new EventArgs());
+                visualChild.MouseLeftButtonUp?.Invoke(this, new EventArgs());
             else if (mouseButton == MouseButton.Right && e.IsButtonDown)
-                MouseRightButtonDown?.Invoke(this, new EventArgs());
+                visualChild.MouseRightButtonDown?.Invoke(this, new EventArgs());
             else if (mouseButton == MouseButton.Right && !e.IsButtonDown)
-                MouseRightButtonUp?.Invoke(this, new EventArgs());
+                visualChild.MouseRightButtonUp?.Invoke(this, new EventArgs());
         }
 
         internal void TriggerWaylandMouseEnter(double x, double y)

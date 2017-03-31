@@ -18,8 +18,6 @@ namespace Ztk.Demos.SampleApp
         }
     }
 
-    // "Click" and "Double Click" events - needs button tracking better as a MouseState object
-
     // Layouts totally broken for various alignments (see Window sample for nested borders where auto isnt'w roking by default and 0 values being used)
     // Border
     //   Stretching width/height overlaps entire parent grid somehow

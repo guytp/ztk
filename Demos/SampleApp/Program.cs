@@ -18,16 +18,6 @@ namespace Ztk.Demos.SampleApp
         }
     }
 
-    // Layouts totally broken for various alignments (see Window sample for nested borders where auto isnt'w roking by default and 0 values being used)
-    // Border
-    //   Stretching width/height overlaps entire parent grid somehow
-    //   Mask child when rounded corners
-    // Grid
-    //    margins not being handled correctly?
-    //    * widths not perfect if * + an auto (some unused space) - or is this margins?
-    //    Mouse events passed to children
-    //    Nested grids test
-
     // Keyboard events
     // Focussed item for keyboard - controls can opt to not have keyboard focus
     // TextBox

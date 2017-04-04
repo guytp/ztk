@@ -5,230 +5,16 @@ namespace Ztk.Demos.SampleApp
 {
     public class SampleWindow : Window
     {
-        public void OldSampleWindow()
-        {
-            Background = new SolidColorBrush(new Color(0x2D / 255f, 0x2D / 255f, 0x30 / 255f));
-            Border mainBorder = new Border
-            {
-                BorderThickness = 1,
-                BorderBrush = Brushes.DodgerBlue,
-                HorizontalAlignment = HorizontalAlignment.Stretch,
-                VerticalAlignment = VerticalAlignment.Stretch,
-            };
-            Child = mainBorder;
-
-            Grid mainGrid = new Grid
-            {
-                HorizontalAlignment = HorizontalAlignment.Stretch,
-                VerticalAlignment = VerticalAlignment.Stretch,
-            };
-            mainBorder.Child = mainGrid;
-            mainGrid.ColumnDefinitions.Add(new ColumnDefinition(new GridLength(1, GridLengthType.Star)));
-            mainGrid.RowDefinitions.Add(new RowDefinition(new GridLength(3)));
-            mainGrid.RowDefinitions.Add(new RowDefinition(new GridLength(25)));
-            mainGrid.RowDefinitions.Add(new RowDefinition(new GridLength(3)));
-            mainGrid.RowDefinitions.Add(new RowDefinition(new GridLength(1, GridLengthType.Star)));
-            Border fillerBorder = new Border { Background = Brushes.DodgerBlue, HorizontalAlignment = HorizontalAlignment.Stretch, VerticalAlignment = VerticalAlignment.Stretch, BorderBrush = null, BorderThickness = 0 };
-            mainGrid.Children.Add(fillerBorder);
-            mainGrid.SetChildRow(fillerBorder, 0);
-            Border fillerBorder2 = new Border { Background = Brushes.DodgerBlue, HorizontalAlignment = HorizontalAlignment.Stretch, VerticalAlignment = VerticalAlignment.Stretch, BorderBrush = null, BorderThickness = 0 };
-            mainGrid.Children.Add(fillerBorder2);
-            mainGrid.SetChildRow(fillerBorder2, 2);
-            Grid titleGrid = new Grid
-            {
-                Background = Brushes.DodgerBlue,
-                HorizontalAlignment = HorizontalAlignment.Stretch,
-                VerticalAlignment = VerticalAlignment.Stretch,
-            };
-            mainGrid.Children.Add(titleGrid);
-            mainGrid.SetChildRow(titleGrid, 1);
-            titleGrid.RowDefinitions.Add(new RowDefinition(new GridLength(1, GridLengthType.Star)));
-            titleGrid.ColumnDefinitions.Add(new ColumnDefinition(new GridLength(60)));
-            titleGrid.ColumnDefinitions.Add(new ColumnDefinition(new GridLength(398)));
-            titleGrid.ColumnDefinitions.Add(new ColumnDefinition(new GridLength(60)));
-            titleGrid.ColumnDefinitions.Add(new ColumnDefinition(new GridLength(60)));
-            titleGrid.ColumnDefinitions.Add(new ColumnDefinition(new GridLength(60)));
-
-            TextBlock windowMenu = new TextBlock
-            {
-                Text = "  🐱  ",
-                FontSize = 22,
-                Foreground = Brushes.White,
-                VerticalAlignment = VerticalAlignment.Middle,
-                HorizontalAlignment = HorizontalAlignment.Middle
-            };
-            titleGrid.SetChildColumn(windowMenu, 0);
-            titleGrid.Children.Add(windowMenu);
-
-            TextBlock title = new TextBlock
-            {
-                Text = "Sample Application",
-                FontSize = 18,
-                Foreground = Brushes.White,
-                VerticalAlignment = VerticalAlignment.Middle,
-                HorizontalAlignment = HorizontalAlignment.Left
-            };
-            titleGrid.SetChildColumn(title, 1);
-            titleGrid.Children.Add(title);
-
-
-            TextBlock minimiseMenu = new TextBlock
-            {
-                Text = "  _  ",
-                FontSize = 22,
-                Foreground = Brushes.White,
-                VerticalAlignment = VerticalAlignment.Middle,
-                HorizontalAlignment = HorizontalAlignment.Middle
-            };
-            titleGrid.SetChildColumn(minimiseMenu, 2);
-            titleGrid.Children.Add(minimiseMenu);
-
-
-            TextBlock maximiseMenu = new TextBlock
-            {
-                Text = "  □  ",
-                FontSize = 22,
-                Foreground = Brushes.White,
-                VerticalAlignment = VerticalAlignment.Middle,
-                HorizontalAlignment = HorizontalAlignment.Middle
-            };
-            titleGrid.SetChildColumn(maximiseMenu, 3);
-            titleGrid.Children.Add(maximiseMenu);
-
-            TextBlock closeMenu = new TextBlock
-            {
-                Text = "  X  ",
-                FontSize = 22,
-                Foreground = Brushes.White,
-                VerticalAlignment = VerticalAlignment.Middle,
-                HorizontalAlignment = HorizontalAlignment.Middle
-            };
-            titleGrid.SetChildColumn(closeMenu, 4);
-            titleGrid.Children.Add(closeMenu);
-
-            TextBlock mainContentText = new TextBlock
-            {
-                FontSize = 24,
-                Text = "Main content would go here",
-                Foreground = Brushes.LimeGreen,
-                HorizontalAlignment = HorizontalAlignment.Middle,
-                VerticalAlignment = VerticalAlignment.Middle
-            };
-            mainGrid.SetChildRow(mainContentText, 3);
-            mainGrid.Children.Add(mainContentText);
-
-        }
-        public void GridsSampleWindow()
-        {
-            Background = new SolidColorBrush(new Color(0, 1, 0, 0.5));
-            MouseLeftButtonDown += OnLeftButtonDown;
-
-
-
-            Grid mainGrid = new Grid();
-            mainGrid.RowDefinitions.Add(new RowDefinition(new GridLength(1, GridLengthType.Star)));
-            mainGrid.RowDefinitions.Add(new RowDefinition(new GridLength(1, GridLengthType.Star)));
-            mainGrid.ColumnDefinitions.Add(new ColumnDefinition(new GridLength(1, GridLengthType.Star)));
-            mainGrid.Margin = new FourSidedNumber(5);
-            mainGrid.Background = Brushes.RosyBrown;
-            Child = mainGrid;
-
-            Grid gridTop = new Grid();
-            mainGrid.Children.Add(gridTop);
-            mainGrid.SetChildRow(gridTop, 0);
-            gridTop.RowDefinitions.Add(new RowDefinition(new GridLength(1, GridLengthType.Star)));
-            gridTop.RowDefinitions.Add(new RowDefinition(new GridLength()));
-            gridTop.RowDefinitions.Add(new RowDefinition(new GridLength()));
-            gridTop.ColumnDefinitions.Add(new ColumnDefinition(new GridLength(1, GridLengthType.Star)));
-            gridTop.ColumnDefinitions.Add(new ColumnDefinition(new GridLength()));
-            gridTop.HorizontalAlignment = HorizontalAlignment.Stretch;
-            gridTop.VerticalAlignment = VerticalAlignment.Stretch;
-            gridTop.Background = Brushes.OrangeRed;
-            gridTop.Margin = new FourSidedNumber(20);
-
-            TextBlock tbTop = new TextBlock
-            {
-                Background = Brushes.Red,
-                Foreground = Brushes.White,
-                Text = "Top  content"
-            };
-            mainGrid.Children.Add(tbTop);
-            mainGrid.SetChildColumn(tbTop, 0);
-            mainGrid.SetChildRow(tbTop, 0);
-            Random rand = new Random();
-            for (int row = 0; row < gridTop.RowDefinitions.Count; row++)
-                for (int column = 0; column < gridTop.ColumnDefinitions.Count; column++)
-                {
-                    TextBlock textBlock = new TextBlock
-                    {
-                        Text = "R" + row + "C" + column,
-                        FontSize = 32,
-                        Margin = new FourSidedNumber(5),
-                        Foreground = Brushes.DodgerBlue,
-                        Background = new SolidColorBrush(new Ztk.Drawing.Color(rand.NextDouble(), rand.NextDouble(), rand.NextDouble())),
-                        Padding = new FourSidedNumber(5),
-                        HorizontalAlignment = HorizontalAlignment.Stretch,
-                        VerticalAlignment = VerticalAlignment.Stretch
-                    };
-                    gridTop.Children.Add(textBlock);
-                    gridTop.SetChildRow(textBlock, row);
-                    gridTop.SetChildColumn(textBlock, column);
-                }
-
-            // Now add a border in bottom half of screen
-            Border border = new Border
-            {
-                Background = Brushes.Yellow,
-                CornerRadius = 10,
-                BorderThickness = 1.5,
-                HorizontalAlignment = HorizontalAlignment.Left,
-                VerticalAlignment = VerticalAlignment.Top,
-            };
-            mainGrid.Children.Add(border);
-            mainGrid.SetChildRow(border, 1);
-            TextBlock tb = new TextBlock
-            {
-                Text = "TB in border in pink grid",
-                FontSize = 24,
-                Padding = new FourSidedNumber(5),
-                Background = Brushes.LimeGreen,
-                Foreground = Brushes.DodgerBlue,
-                Margin = new FourSidedNumber(5),
-                HorizontalAlignment = HorizontalAlignment.Left,
-                VerticalAlignment = VerticalAlignment.Top
-            };
-            border.Child = tb;
-        }
+        private TextBlock _trackerText;
+        private TextBlock _inputText;
+        private decimal _count = 0;
+        private string _lastAction;
+        private string _lastOp = "+";
 
         public SampleWindow()
+            : base(new Size(280, 380))
         {
-            MouseLeftButtonDown += OnLeftButtonDown;
-            Button btn = new Button
-            {
-                Content = "This is a test",
-                Margin = new FourSidedNumber(15),
-                HorizontalAlignment = HorizontalAlignment.Middle,
-                VerticalAlignment = VerticalAlignment.Middle
-            };
-            btn.MouseLeftButtonDown += OnMouseLeftButtonDown;
-            btn.MouseLeftButtonUp += OnMouseLeftButtonUp;
-            btn.Click += OnClick;
-            btn.DoubleClick += OnDoubleClick;
-            Border b = new Border
-            {
-                BorderThickness = 2,
-                BorderBrush = Brushes.Red,
-                Margin = new FourSidedNumber(10),
-                Background = Brushes.Gray,
-                Child = btn,
-                HorizontalAlignment = HorizontalAlignment.Stretch,
-                VerticalAlignment = VerticalAlignment.Stretch
-            };
-            Child = b;
-        }
 
-        public void CalculatorampleWindow()
-        {
             Background = Brushes.Black;
             Grid mainGrid = new Grid
             {
@@ -236,43 +22,44 @@ namespace Ztk.Demos.SampleApp
                 VerticalAlignment = VerticalAlignment.Stretch,
             };
             Child = mainGrid;
-            mainGrid.RowDefinitions.Add(new RowDefinition(new GridLength()));
+            mainGrid.MouseLeftButtonDown += OnLeftButtonDown;
+            mainGrid.RowDefinitions.Add(new RowDefinition(new GridLength(30)));
             mainGrid.RowDefinitions.Add(new RowDefinition(new GridLength()));
             mainGrid.RowDefinitions.Add(new RowDefinition(new GridLength(1, GridLengthType.Star)));
-            mainGrid.ColumnDefinitions.Add(new ColumnDefinition());
+            mainGrid.ColumnDefinitions.Add(new ColumnDefinition(new GridLength(1, GridLengthType.Star)));
 
-            TextBlock trackerText = new TextBlock
+            _trackerText = new TextBlock
             {
-                Text = "1 + ",
                 Foreground = Brushes.LightGray,
-                FontSize = 8,
+                FontSize = 12,
                 HorizontalAlignment = HorizontalAlignment.Right,
+                VerticalAlignment = VerticalAlignment.Middle,
                 Margin = new FourSidedNumber(5)
             };
-            mainGrid.Children.Add(trackerText);
-            mainGrid.SetChildColumn(trackerText, 0);
-            mainGrid.SetChildRow(trackerText, 0);
+            mainGrid.Children.Add(_trackerText);
+            mainGrid.SetChildColumn(_trackerText, 0);
+            mainGrid.SetChildRow(_trackerText, 0);
+            _trackerText.MouseLeftButtonDown += OnLeftButtonDown;
 
-
-            TextBlock inputText = new TextBlock
+            _inputText = new TextBlock
             {
-                Text = "123",
+                Text = "0",
                 Foreground = Brushes.White,
                 FontSize = 32,
                 FontWeight = FontWeight.Bold,
                 HorizontalAlignment = HorizontalAlignment.Right,
                 Margin = new FourSidedNumber(5)
             };
-            mainGrid.Children.Add(inputText);
-            mainGrid.SetChildColumn(inputText, 0);
-            mainGrid.SetChildRow(inputText, 1);
+            mainGrid.Children.Add(_inputText);
+            mainGrid.SetChildColumn(_inputText, 0);
+            mainGrid.SetChildRow(_inputText, 1);
+            _inputText.MouseLeftButtonDown += OnLeftButtonDown;
 
             Grid buttonsGrid = new Grid
             {
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 VerticalAlignment = VerticalAlignment.Stretch,
             };
-            buttonsGrid.RowDefinitions.Add(new RowDefinition(new GridLength(1, GridLengthType.Star)));
             buttonsGrid.RowDefinitions.Add(new RowDefinition(new GridLength(1, GridLengthType.Star)));
             buttonsGrid.RowDefinitions.Add(new RowDefinition(new GridLength(1, GridLengthType.Star)));
             buttonsGrid.RowDefinitions.Add(new RowDefinition(new GridLength(1, GridLengthType.Star)));
@@ -285,7 +72,7 @@ namespace Ztk.Demos.SampleApp
             mainGrid.SetChildColumn(buttonsGrid, 0);
             mainGrid.SetChildRow(buttonsGrid, 2);
 
-            string[] buttons = new[] { "CE", "^2", "sqrt", "/", "7", "8", "9", "X", "4", "5", "6", "-", "1", "2", "3", "+", "+-", "0", ".", "=" };
+            string[] buttons = new[] { "7", "8", "9", "C", "4", "5", "6", "-", "1", "2", "3", "+", "±", "0", ".", "=" };
             int row = 0;
             int column = 0;
             for (int i = 0; i < buttons.Length; i++)
@@ -296,42 +83,77 @@ namespace Ztk.Demos.SampleApp
                     column = 0;
                 }
 
-                Button b = new Button
+                if (!string.IsNullOrEmpty(buttons[i]))
                 {
-                    Content = buttons[i],
-                    HorizontalAlignment = HorizontalAlignment.Stretch,
-                    VerticalAlignment = VerticalAlignment.Stretch
-                };
-                buttonsGrid.Children.Add(b);
-                buttonsGrid.SetChildColumn(b, column);
-                buttonsGrid.SetChildRow(b, row);
-                b.Click += CalculatorButtonOnClick;
 
+                    Button b = new Button
+                    {
+                        Content = buttons[i],
+                        HorizontalAlignment = HorizontalAlignment.Stretch,
+                        VerticalAlignment = VerticalAlignment.Stretch
+                    };
+                    buttonsGrid.Children.Add(b);
+                    buttonsGrid.SetChildColumn(b, column);
+                    buttonsGrid.SetChildRow(b, row);
+                    b.Click += CalculatorButtonOnClick;
+                }
                 column++;
             }
 
         }
 
+
         private void CalculatorButtonOnClick(object sender, EventArgs e)
         {
-            Console.WriteLine(((Button)sender).Content + " clicked");
-        }
-
-        private void OnMouseLeftButtonDown(object sender, EventArgs e)
-        {
-            Console.WriteLine("Mouse down!");
-        }
-        private void OnMouseLeftButtonUp(object sender, EventArgs e)
-        {
-            Console.WriteLine("Mouse up!");
-        }
-        private void OnClick(object sender, EventArgs e)
-        {
-            Console.WriteLine("Button clicked!");
-        }
-        private void OnDoubleClick(object sender, EventArgs e)
-        {
-            Console.WriteLine("Double click!");
+            string action = ((Button)sender).Content as string;
+            decimal number = decimal.Parse(_inputText.Text);
+            if (_lastAction != null && _lastAction.Length > 0 && (_lastAction == "+" || _lastAction == "-" || _lastAction == "="))
+                _inputText.Text = "0";
+            if (action == "C")
+            {
+                _count = 0;
+                _trackerText.Text = string.Empty;
+                _inputText.Text = "0";
+                _lastOp = "+";
+            }
+            else if (action == "-" || action == "+")
+            {
+                if (_lastOp == "-")
+                    _count -= number;
+                else if (_lastOp == "+")
+                    _count += number;
+                _trackerText.Text += number + " " + action + " ";
+                _inputText.Text = _count.ToString();
+                _lastOp = action;
+            }
+            else if (action == "±")
+            {
+                if (_inputText.Text == "0")
+                    return;
+                if (_inputText.Text.Substring(0, 1) == "-")
+                    _inputText.Text = _inputText.Text.Substring(1);
+                else
+                    _inputText.Text = "-" + _inputText.Text;
+            }
+            else if (action == "=")
+            {
+                if (_lastOp == "-")
+                    _count -= number;
+                else if (_lastOp == "+")
+                    _count += number;
+                _inputText.Text = _count.ToString();
+                _trackerText.Text = string.Empty;
+                _count = 0;
+            }
+            else
+            {
+                if (action == "." && _inputText.Text.Contains("."))
+                    return;
+                if (_inputText.Text == "0" && action != ".")
+                    _inputText.Text = string.Empty;
+                _inputText.Text += action;
+            }
+            _lastAction = action;
         }
 
         private void OnLeftButtonDown(object sender, EventArgs e)

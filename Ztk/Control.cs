@@ -11,13 +11,19 @@ namespace Ztk
 
         private Control _currentMouseFocus;
 
+        public Brush Background { get; set; }
+
         public double ActualWidth { get; private set; }
 
         public double ActualHeight { get; private set; }
 
+        protected bool AutoRenderBackground { get; set; }
+
         public double Opacity { get; set; }
 
         public FourSidedNumber Margin { get; set; }
+
+        public string Id { get; set; }
 
         public virtual HorizontalAlignment HorizontalAlignment { get; set; }
 
@@ -51,6 +57,7 @@ namespace Ztk
 
         protected Control()
         {
+            AutoRenderBackground = true;
             ChildrenInternal = new List<Control>();
             LayoutInformation = new List<LayoutInformation>();
             Opacity = 1;
@@ -72,8 +79,7 @@ namespace Ztk
         }
 
         public abstract Size MeasureDesiredSize(Size availableSize);
-
-        public abstract void Render(GraphicsContext g);
+        
 
         #region Wayland Pointer Triggering
         internal virtual void TriggerWaylandPointerButton(WaylandPointerButtonEventArgs e)
@@ -200,6 +206,36 @@ namespace Ztk
             outputChildCoordinates.X = x;
             outputChildCoordinates.Y = y;
             return child;
+        }
+
+        public virtual void Render(GraphicsContext g)
+        {
+            // Paint our background
+            if (AutoRenderBackground)
+                PaintBackground(g, Background);
+
+            RenderChildren(g);
+        }
+
+        protected virtual void RenderChildren(GraphicsContext g)
+        {
+            foreach (LayoutInformation layoutInformation in LayoutInformation.OrderByDescending(li => li.ZIndex))
+            {
+                // Now render the child
+                int width = (int)Math.Round(layoutInformation.Rectangle.Width);
+                int height = (int)Math.Round(layoutInformation.Rectangle.Height);
+                if (width ==0 || height == 0)
+                    continue;
+                using (ImageSurface surface = new ImageSurface(Format.ARGB32, width, height))
+                {
+                    using (GraphicsContext childContext = new GraphicsContext(surface))
+                    {
+                        layoutInformation.Control.Render(childContext);
+                        g.SetSourceSurface(surface, (int)Math.Round(layoutInformation.Rectangle.X), (int)Math.Round(layoutInformation.Rectangle.Y));
+                        g.PaintWithAlpha(layoutInformation.Control.Opacity);
+                    }
+                }
+            }
         }
     }
 }

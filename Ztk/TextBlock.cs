@@ -17,8 +17,6 @@ namespace Ztk
         public FontWeight FontWeight { get; set; }
         public FourSidedNumber Padding { get; set; }
 
-        public Brush Background { get; set; }
-
         public TextBlock()
         {
             FontFamily = "Sans";

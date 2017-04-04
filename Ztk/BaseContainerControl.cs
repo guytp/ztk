@@ -6,7 +6,6 @@ namespace Ztk
 {
     public abstract class BaseContainerControl : Control
     {
-        public Brush Background { get; set; }
 
         protected BaseContainerControl()
         {

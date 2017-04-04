@@ -6,6 +6,8 @@ namespace Ztk
     {
         public static Size GetSize(this string value, string fontFamily, double fontSize, FontSlant fontSlant, FontWeight fontWeight)
         {
+            if (string.IsNullOrEmpty(value))
+                return new Size(0, 0);
             using (ImageSurface surface = new ImageSurface(Format.Argb32, 0, 0))
             {
                 using (GraphicsContext context = new GraphicsContext(surface))

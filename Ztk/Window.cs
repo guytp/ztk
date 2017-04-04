@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using Ztk.Drawing;
 using Ztk.Wayland;
 
 namespace Ztk
@@ -15,6 +17,10 @@ namespace Ztk
         /// Gets a handle to the surface itself.
         /// </summary>
         private ShellSurface _surface;
+
+        private readonly Queue<DateTime> _fpsQueue = new Queue<DateTime>();
+
+        private DateTime _lastFpsOutput;
         #endregion
 
         protected override FourSidedNumber InternalSpacing
@@ -43,18 +49,48 @@ namespace Ztk
             }
         }
 
+        protected double Fps { get; private set; }
+
         #region Constructors
         /// <summary>
         /// Create a new instance of this class.
         /// </summary>
         public Window()
+            : this(new Size(640, 480))
         {
+        }
+
+        public Window(Size initialSize)
+        {
+
             HorizontalAlignment = HorizontalAlignment.Stretch;
             VerticalAlignment = VerticalAlignment.Stretch;
             Background = Brushes.White;
-            SetActualSize(new Size(640, 480));
+            SetActualSize(initialSize);
         }
         #endregion
+
+        public override void Render(GraphicsContext g)
+        {
+            DateTime now = DateTime.UtcNow;
+            while (_fpsQueue.Count > 0 && (_fpsQueue.Count > 500 || now.Subtract(_fpsQueue.Peek()).TotalSeconds > 30))
+                _fpsQueue.Dequeue();
+            _fpsQueue.Enqueue(now);
+
+            base.Render(g);
+
+            DateTime first = _fpsQueue.Peek();
+            double totalSeconds = now.Subtract(first).TotalSeconds;
+            if (_fpsQueue.Count > 50 && totalSeconds > 0)
+            {
+                Fps = _fpsQueue.Count / totalSeconds;
+                if (now.Subtract(_lastFpsOutput).TotalSeconds > 3)
+                {
+                    Console.WriteLine("FPS: " + Fps);
+                    _lastFpsOutput = now;
+                }
+            }
+        }
 
         /// <summary>
         /// Show the window in the current application, starting a new application if required.

@@ -26,14 +26,7 @@ namespace Ztk
         }
 
         protected abstract FourSidedNumber InternalSpacing { get; }
-
-        protected bool AutoRenderBackground { get; set; }
-
-        protected ContainerControl()
-        {
-            AutoRenderBackground = true;
-        }
-
+        
         public override Size MeasureDesiredSize(Size availableSize)
         {
             // If we have no children this one is easy
@@ -98,33 +91,10 @@ namespace Ztk
                 y = finalSizeToUse.Height;
             LayoutInformation layoutInformation = GetLayoutInformationForChild(Child);
             layoutInformation.Rectangle = new Rectangle(x, y, childSize.Width, childSize.Height);
+            layoutInformation.ZIndex = 0;
 
             // Return size including our borders and child margins factoring in any stretch
             return finalSizeToUse;
-        }
-
-        public override void Render(GraphicsContext g)
-        {
-            // Paint our background
-            if (AutoRenderBackground)
-                PaintBackground(g, Background);
-
-            int zIndex = 0;
-            foreach (Control child in ChildrenInternal)
-            {
-                // Now render the child
-                LayoutInformation layoutInformation = GetLayoutInformationForChild(Child);
-                using (ImageSurface childSurface = new ImageSurface(Format.ARGB32, (int)Math.Round(layoutInformation.Rectangle.Width), (int)Math.Round(layoutInformation.Rectangle.Height)))
-                {
-                    using (GraphicsContext childContext = new GraphicsContext(childSurface))
-                    {
-                        Child.Render(childContext);
-                        g.SetSourceSurface(childSurface, (int)Math.Round(layoutInformation.Rectangle.X), (int)Math.Round(layoutInformation.Rectangle.Y));
-                        g.PaintWithAlpha(Child.Opacity);
-                        layoutInformation.ZIndex = zIndex++;
-                    }
-                }
-            }
         }
     }
 }

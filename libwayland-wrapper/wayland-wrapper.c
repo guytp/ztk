@@ -1,4 +1,8 @@
-#define logprintf printf
+#ifdef DEBUG
+#define logprintf(...) printf(__VA_ARGS__)
+#else
+#define logprintf(...) (void)0
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -23,15 +27,12 @@ void * wlw_get_registry(struct wl_display *display)
 }
 
 struct wl_registry_listener registryListener = {};
-
 struct wl_shell_surface_listener shellSurfaceListener = {};
-
 struct wl_shm_listener sharedMemoryListener = {};;
-
 struct wl_seat_listener seatListener = {};
-
 struct wl_callback_listener frameListener = {};
 struct wl_pointer_listener pointerListener = {};
+struct wl_keyboard_listener keyboardListener = {};
 
 struct wl_callback* frameCallback = NULL;
 
@@ -297,6 +298,38 @@ void wlw_pointer_add_listener(struct wl_pointer *pointer,
     pointerListener.axis_stop = axis_stop;
     pointerListener.axis_discrete = axis_discrete;
     wl_pointer_add_listener(pointer, &pointerListener, NULL);   
+}
+
+
+void wlw_keyboard_destroy(struct wl_keyboard *keyboard)
+{
+    logprintf("wlw_keyboard_destroy()\n");
+    wl_keyboard_destroy(keyboard);
+}
+
+void * wlw_seat_get_keyboard(struct wl_seat *seat)
+{
+    logprintf("wlw_seat_get_keyboard()\n");
+    struct wl_keyboard * keyboard = wl_seat_get_keyboard(seat);
+    return keyboard;
+}
+
+void wlw_keyboard_add_listener(struct wl_keyboard *keyboard,
+	void (*keymap)(void *data, struct wl_keyboard *wl_keyboard, uint32_t format, int32_t fd, uint32_t size),
+	void (*enter)(void *data, struct wl_keyboard *wl_keyboard, uint32_t serial, struct wl_surface *surface, struct wl_array *keys),
+	void (*leave)(void *data, struct wl_keyboard *wl_keyboard, uint32_t serial, struct wl_surface *surface),
+	void (*key)(void *data, struct wl_keyboard *wl_keyboard, uint32_t serial, uint32_t time, uint32_t key, uint32_t state),
+	void (*modifiers)(void *data, struct wl_keyboard *wl_keyboard, uint32_t serial, uint32_t mods_depressed, uint32_t mods_latched, uint32_t mods_locked, uint32_t group),
+	void (*repeat_info)(void *data, struct wl_keyboard *wl_keyboard, int32_t rate, int32_t delay)
+) {
+    logprintf("wlw_keyboard_add_listener()\n");
+    keyboardListener.keymap = keymap;
+    keyboardListener.enter = enter;
+    keyboardListener.leave = leave;
+    keyboardListener.key = key;
+    keyboardListener.modifiers = modifiers;
+    keyboardListener.repeat_info = repeat_info;
+    wl_keyboard_add_listener(keyboard, &keyboardListener, NULL);
 }
 
 double wlw_fixed_to_double(wl_fixed_t f)

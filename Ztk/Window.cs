@@ -23,6 +23,8 @@ namespace Ztk
         private DateTime _lastFpsOutput;
         #endregion
 
+        internal bool FpsTrackingEnabled { get; set; }
+
         protected override FourSidedNumber InternalSpacing
         {
             get { return new FourSidedNumber(0); }
@@ -58,6 +60,7 @@ namespace Ztk
         public Window()
             : this(new Size(640, 480))
         {
+            FpsTrackingEnabled = false;
         }
 
         public Window(Size initialSize)
@@ -73,21 +76,27 @@ namespace Ztk
         public override void Render(GraphicsContext g)
         {
             DateTime now = DateTime.UtcNow;
-            while (_fpsQueue.Count > 0 && (_fpsQueue.Count > 500 || now.Subtract(_fpsQueue.Peek()).TotalSeconds > 30))
-                _fpsQueue.Dequeue();
-            _fpsQueue.Enqueue(now);
+            if (FpsTrackingEnabled)
+            {
+                while (_fpsQueue.Count > 0 && (_fpsQueue.Count > 500 || now.Subtract(_fpsQueue.Peek()).TotalSeconds > 30))
+                    _fpsQueue.Dequeue();
+                _fpsQueue.Enqueue(now);
+            }
 
             base.Render(g);
 
-            DateTime first = _fpsQueue.Peek();
-            double totalSeconds = now.Subtract(first).TotalSeconds;
-            if (_fpsQueue.Count > 50 && totalSeconds > 0)
+            if (FpsTrackingEnabled)
             {
-                Fps = _fpsQueue.Count / totalSeconds;
-                if (now.Subtract(_lastFpsOutput).TotalSeconds > 3)
+                DateTime first = _fpsQueue.Peek();
+                double totalSeconds = now.Subtract(first).TotalSeconds;
+                if (_fpsQueue.Count > 50 && totalSeconds > 0)
                 {
-                    Console.WriteLine("FPS: " + Fps);
-                    _lastFpsOutput = now;
+                    Fps = _fpsQueue.Count / totalSeconds;
+                    if (now.Subtract(_lastFpsOutput).TotalSeconds > 3)
+                    {
+                        Console.WriteLine("FPS: " + Fps);
+                        _lastFpsOutput = now;
+                    }
                 }
             }
         }

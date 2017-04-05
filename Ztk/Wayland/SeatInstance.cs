@@ -13,7 +13,11 @@ namespace Ztk.Wayland
         [DllImport("wayland-wrapper", EntryPoint = "wlw_seat_get_pointer")]
         private static extern IntPtr SeatPointerGet(IntPtr seatHandle);
 
+        [DllImport("wayland-wrapper", EntryPoint = "wlw_seat_get_keyboard")]
+        private static extern IntPtr SeatKeyboardGet(IntPtr seatHandle);
+
         private Pointer _pointer;
+        private Keyboard _keyboard;
 
         public string Name
         {
@@ -30,6 +34,18 @@ namespace Ztk.Wayland
             {
                 _pointer?.Dispose();
                 _pointer = value;
+            }
+        }
+        public Keyboard Keyboard
+        {
+            get
+            {
+                return _keyboard;
+            }
+            private set
+            {
+                _keyboard?.Dispose();
+                _keyboard = value;
             }
         }
 
@@ -54,6 +70,8 @@ namespace Ztk.Wayland
                 }
             if (newFlags.Contains(SeatCapability.Pointer))
                 Pointer = new Pointer(SeatPointerGet(Handle));
+            if (newFlags.Contains(SeatCapability.Keyboard))
+                Keyboard = new Keyboard(SeatKeyboardGet(Handle));
 
             // Determine removed capabilities - if pointer is removed we must dispose of it
             List<SeatCapability> removedFlags = new List<SeatCapability>();
@@ -65,6 +83,8 @@ namespace Ztk.Wayland
                 }
             if (removedFlags.Contains(SeatCapability.Pointer))
                 Pointer = null;
+            if (removedFlags.Contains(SeatCapability.Keyboard))
+                Keyboard = null;
         }
 
         protected override void ReleaseWaylandObject()

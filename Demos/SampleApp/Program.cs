@@ -18,16 +18,14 @@ namespace Ztk.Demos.SampleApp
         }
     }
 
-    // Keyboard events
-    //   - Keyboard Focus for controls - get lost/gained keyboard focus events
-    //   - Parents can disable keyboard focus down a tree
-    //   - Keys that are down on focus - capture these to reset state (need for numlock etc)
-    //   - Deal with repeat ourself throughout app - send a KeyRepeat event if XKB agrees
+    // Focus
+    //    - bool Focus() method on each control goes to its parent and asks if it can focus - goes right to top of tree before returning (CanFocus() then SetFocus() called)
+    //    - Whole tree updates which single control has focus
+    //    - Keyboard events sent to control with focus
 
     // Hookup in Calculator app to keyboard
     // TextBox
-
-    // Control focus concept (Sets IsFocussed and then tries to get kbd focus unless control expressly doesnt focus kbd, works down tree to disable focusable)
+    //    - If focussed have I-Bar
 
     // use xdg shell
     // Window Decorations (include maximise / full-screen) - configurable
@@ -40,6 +38,8 @@ namespace Ztk.Demos.SampleApp
 
     // Multi-window support (callback objects not static in C code)
 
+    // Keyboard - support for repeats
+    // Keyboard - initial key states on enter nto being set
     // Data binding
     // Styles/themes
     // Templates
@@ -50,6 +50,8 @@ namespace Ztk.Demos.SampleApp
 
     // All UI components implement INotifyPropertyChanged
     // Implement a render is required / layout is required / only re-composite changed areas model - trigger renders required when any changes made to properties - store last used buffers (or just write alpha over?)
+
+    // Mouse events pass through transparent controls to those underneath - concept here of bubble up/down as with WPF
 
     // Button content presenter?
     // Image (via ImageBrush)
@@ -63,5 +65,6 @@ namespace Ztk.Demos.SampleApp
 
     // MessageBox (can be popup)
     // Grid Row/Column Span
-    // Mouse events pass through transparent controls to those underneath
+
+    // Custom mouse cursors
 }

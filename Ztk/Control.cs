@@ -10,6 +10,7 @@ namespace Ztk
     {
 
         private Control _currentMouseFocus;
+        private bool _isFocussed;
 
         public Brush Background { get; set; }
 
@@ -18,6 +19,28 @@ namespace Ztk
         public double ActualHeight { get; private set; }
 
         protected bool AutoRenderBackground { get; set; }
+
+        public bool IsFocusable { get; set; }
+
+        public bool IsFocussed
+        {
+            get
+            {
+                return _isFocussed;
+            }
+            set
+            {
+                if (value == _isFocussed)
+                    return;
+                _isFocussed = value;
+                if (value)
+                    FocusObtained?.Invoke(this, new EventArgs());
+                else
+                    FocusLost?.Invoke(this, new EventArgs());
+            }
+        }
+
+        internal Control Parent { get; set; }
 
         public double Opacity { get; set; }
 
@@ -36,6 +59,10 @@ namespace Ztk
         protected List<LayoutInformation> LayoutInformation { get; set; }
 
         #region Events
+        public event EventHandler FocusObtained;
+
+        public event EventHandler FocusLost;
+
         public event EventHandler MouseEnter;
 
         public event EventHandler MouseLeave;
@@ -53,6 +80,9 @@ namespace Ztk
         public event EventHandler<MouseButtonEventArgs> MouseButtonDown;
 
         public event EventHandler<MouseButtonEventArgs> MouseButtonUp;
+
+        public event EventHandler<KeyPressEventArgs> KeyPress;
+        public event EventHandler<KeyPressEventArgs> KeyRelease;
         #endregion
 
         protected Control()
@@ -61,6 +91,14 @@ namespace Ztk
             ChildrenInternal = new List<Control>();
             LayoutInformation = new List<LayoutInformation>();
             Opacity = 1;
+            IsFocusable = true;
+            MouseLeftButtonDown += Control_MouseLeftButtonDown;
+        }
+
+        private void Control_MouseLeftButtonDown(object sender, EventArgs e)
+        {
+            if (IsFocusable)
+                Focus();
         }
 
         internal void SetActualSize(Size size)
@@ -79,7 +117,7 @@ namespace Ztk
         }
 
         public abstract Size MeasureDesiredSize(Size availableSize);
-        
+
 
         #region Wayland Pointer Triggering
         internal virtual void TriggerWaylandPointerButton(WaylandPointerButtonEventArgs e)
@@ -224,7 +262,7 @@ namespace Ztk
                 // Now render the child
                 int width = (int)Math.Round(layoutInformation.Rectangle.Width);
                 int height = (int)Math.Round(layoutInformation.Rectangle.Height);
-                if (width ==0 || height == 0)
+                if (width == 0 || height == 0)
                     continue;
                 using (ImageSurface surface = new ImageSurface(Format.ARGB32, width, height))
                 {
@@ -236,6 +274,69 @@ namespace Ztk
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Set focus down the hierarchy to be the current control
+        /// </summary>
+        /// <returns>
+        /// True if focus has been set, false if it failed for some reason.
+        /// </returns>
+        public bool Focus()
+        {
+            // If no change, return
+            if (IsFocussed && !ChildrenInternal.Any(c => c.IsFocussed))
+                return true;
+
+            bool gotFocus = Focus(this);
+            IsFocussed = gotFocus;
+            return gotFocus;
+        }
+
+        private bool Focus(Control child)
+        {
+            // If this control isn't focussable return false
+            if (!IsFocusable)
+                return false;
+
+            // Instruct parent to focus to us if possible
+            if (Parent != null)
+                if (!Parent.Focus(this))
+                    return false;
+
+            // Now we know parent has provided appropriate focus we need to instruct all children other than the specified one to lose focus
+            foreach (Control loopChild in ChildrenInternal)
+                child.IsFocussed = loopChild == child;
+            return true;
+        }
+
+
+        internal Control GetFocussedChild()
+        {
+            // Look for any child with focus and keep going until we reach the bottom
+            Control focussedChild = ChildrenInternal.FirstOrDefault(c => c.IsFocussed);
+            if (focussedChild != null)
+                return focussedChild.GetFocussedChild();
+
+            // We didn't find it so it must be us
+            return IsFocussed ? this : null;
+        }
+
+
+        internal void TriggerKeyDown(KeyboardState keyboardState, XkbKeyPressData keyData)
+        {
+            Control child = GetFocussedChild();
+            if (child == null)
+                return;
+            child.KeyPress?.Invoke(child, new KeyPressEventArgs(keyboardState, keyData.Key, keyData.Value));
+        }
+
+        internal void TriggerKeyUp(KeyboardState keyboardState, XkbKeyPressData keyData)
+        {
+            Control child = GetFocussedChild();
+            if (child == null)
+                return;
+            child.KeyRelease?.Invoke(child, new KeyPressEventArgs(keyboardState, keyData.Key, keyData.Value));
         }
     }
 }

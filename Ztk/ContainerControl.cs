@@ -18,10 +18,16 @@ namespace Ztk
             {
                 Control existingChild = Child;
                 if (existingChild != null)
+                {
                     RemoveLayoutInformationForChild(existingChild);
+                    existingChild.Parent = null;
+                }
                 ChildrenInternal.Clear();
                 if (value != null)
+                {
                     ChildrenInternal.Add(value);
+                    value.Parent = this;
+                }
             }
         }
 

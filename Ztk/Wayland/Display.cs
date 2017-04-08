@@ -21,7 +21,6 @@ namespace Ztk.Wayland
 
         protected override void ReleaseWaylandObject()
         {
-            Console.WriteLine("Display released");
             if (Handle != IntPtr.Zero)
             {
                 DisplayDisconnect(Handle);
@@ -39,11 +38,9 @@ namespace Ztk.Wayland
         {
         }
 
-        public void RunLoop()
+        public bool PerformSingleDispatchLoop()
         {
-            while (Dispatch(Handle))
-            {
-            }
+            return Dispatch(Handle);
         }
 
         public void DispatchAndRoundtrip()

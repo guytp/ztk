@@ -18,22 +18,16 @@ namespace Ztk.Demos.SampleApp
         }
     }
 
-    // Focus
-    //    - bool Focus() method on each control goes to its parent and asks if it can focus - goes right to top of tree before returning (CanFocus() then SetFocus() called)
-    //    - Whole tree updates which single control has focus
-    //    - Keyboard events sent to control with focus
-
-    // Hookup in Calculator app to keyboard
     // TextBox
     //    - If focussed have I-Bar
 
     // use xdg shell
+    // Set window Title / class / etc.
     // Window Decorations (include maximise / full-screen) - configurable
     // Window startup maximise/normal/full screen
     // Resize window
 
     // Can define fixed Width/Height (NaA means ignore).  Stretch still takes prescedence.  Apply to whole stack including window.
-    // Set window Title / class / etc.
     // Correctly destroy all wl_ objects and encapsulate in WaylandObject classes
 
     // Multi-window support (callback objects not static in C code)

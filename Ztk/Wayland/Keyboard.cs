@@ -35,6 +35,7 @@ namespace Ztk.Wayland
         private readonly KeyboardOnKeyListener _keyListener;
         private readonly KeyboardOnModifiersListener _modifiersListener;
         private readonly KeyboardOnRepeatInfoListener _repeatInfoListener;
+        private Window _enteredSurface;
         private XkbMap _xkbMap;
         #endregion
 
@@ -72,18 +73,22 @@ namespace Ztk.Wayland
                 keyData = _xkbMap.TrackKeyDown(key);
             else
                 keyData = _xkbMap.TrackKeyUp(key);
-            Console.WriteLine("Key " + state + ": " + keyData.Key + " = " + keyData.Value);
 
             // Now get a copy of the current state
             KeyboardState keyboardState = _xkbMap.GetState();
-            Console.WriteLine(keyboardState.ToString() + Environment.NewLine + "------------------------------------------------------------------------------");
 
-            // TODO: Propogate this as KeyDown(State, Pressed, CharacterPressed) or KeyUp(State, Released, CharacterReleased)
+            // Propogate this as key down or key up
+            if (_enteredSurface == null)
+                return;
+            if (state == KeyState.Pressed)
+                _enteredSurface.TriggerKeyDown(keyboardState, keyData);
+            else
+                _enteredSurface.TriggerKeyUp(keyboardState, keyData);
         }
 
         private void OnLeaveListener(IntPtr data, IntPtr handle, uint serial, IntPtr surfaceHandle)
         {
-            // TODO: Propogate this as a loose focus
+            _enteredSurface?.TriggerDeactivate();
         }
 
         private void OnEnterListener(IntPtr data, IntPtr handle, uint serial, IntPtr surfaceHandle, IntPtr keysPointer)
@@ -91,7 +96,10 @@ namespace Ztk.Wayland
             // Reset our state to be fresh
             _xkbMap?.ResetState();
 
-            // TODO: Propogate this as a focus
+            // Update activate/deactivate states
+            _enteredSurface?.TriggerDeactivate();
+            _enteredSurface = App.CurrentApplication.Registry?.Compositor?.SurfaceForHandle(surfaceHandle)?.RenderTarget as Window;
+            _enteredSurface?.TriggerActivate();
         }
 
         private void OnKeymapListener(IntPtr data, IntPtr handle, KeyboardMapFormat format, int fileDescriptor, uint size)

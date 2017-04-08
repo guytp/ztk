@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using Ztk.Wayland;
 
 namespace Ztk
@@ -32,6 +33,8 @@ namespace Ztk
         /// Defines a handle to the Wayland registry.
         /// </summary>
         internal Registry Registry { get; private set; }
+        public bool IsRunning { get; private set; }
+        private bool IsShuttingDown { get; set; }
         #endregion
 
         #region Events
@@ -93,6 +96,17 @@ namespace Ztk
             Started?.Invoke(this, new EventArgs());
         }
 
+        public void Shutdown()
+        {
+            if (!IsStarted)
+                return;
+            if (IsShuttingDown)
+                return;
+            IsShuttingDown = true;
+            IsRunning = false;
+            IsShuttingDown = false;
+        }
+
         public void Run()
         {
             // Startup if required
@@ -100,7 +114,14 @@ namespace Ztk
                 Startup();
 
             // Now spin as long as the application is alive
-            _display.RunLoop();
+            IsRunning = true;
+            while (IsRunning)
+                if (!_display.PerformSingleDispatchLoop())
+                {
+                    Console.WriteLine("Run loop failed, shutting down");
+                    IsRunning = false;
+                }
+            IsStarted = false;
         }
 
         #region IDisposable Interface
@@ -109,7 +130,6 @@ namespace Ztk
         /// </summary>
         public void Dispose()
         {
-            Console.WriteLine("App disposed");
             if (_display != null)
             {
                 _display.Dispose();

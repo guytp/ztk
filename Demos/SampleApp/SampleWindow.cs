@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Ztk.Drawing;
 
 namespace Ztk.Demos.SampleApp
@@ -7,6 +8,7 @@ namespace Ztk.Demos.SampleApp
     {
         private TextBlock _trackerText;
         private TextBlock _inputText;
+        private Grid _buttonsGrid;
         private decimal _count = 0;
         private string _lastAction;
         private string _lastOp = "+";
@@ -22,6 +24,7 @@ namespace Ztk.Demos.SampleApp
                 VerticalAlignment = VerticalAlignment.Stretch,
             };
             Child = mainGrid;
+            mainGrid.KeyPress += OnKeyPress;
             mainGrid.MouseLeftButtonDown += OnLeftButtonDown;
             mainGrid.RowDefinitions.Add(new RowDefinition(new GridLength(30)));
             mainGrid.RowDefinitions.Add(new RowDefinition(new GridLength()));
@@ -34,7 +37,8 @@ namespace Ztk.Demos.SampleApp
                 FontSize = 12,
                 HorizontalAlignment = HorizontalAlignment.Right,
                 VerticalAlignment = VerticalAlignment.Middle,
-                Margin = new FourSidedNumber(5)
+                Margin = new FourSidedNumber(5),
+                IsFocusable = false
             };
             mainGrid.Children.Add(_trackerText);
             mainGrid.SetChildColumn(_trackerText, 0);
@@ -48,29 +52,31 @@ namespace Ztk.Demos.SampleApp
                 FontSize = 32,
                 FontWeight = FontWeight.Bold,
                 HorizontalAlignment = HorizontalAlignment.Right,
-                Margin = new FourSidedNumber(5)
+                Margin = new FourSidedNumber(5),
+                IsFocusable = false
             };
             mainGrid.Children.Add(_inputText);
             mainGrid.SetChildColumn(_inputText, 0);
             mainGrid.SetChildRow(_inputText, 1);
             _inputText.MouseLeftButtonDown += OnLeftButtonDown;
 
-            Grid buttonsGrid = new Grid
+            _buttonsGrid = new Grid
             {
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 VerticalAlignment = VerticalAlignment.Stretch,
             };
-            buttonsGrid.RowDefinitions.Add(new RowDefinition(new GridLength(1, GridLengthType.Star)));
-            buttonsGrid.RowDefinitions.Add(new RowDefinition(new GridLength(1, GridLengthType.Star)));
-            buttonsGrid.RowDefinitions.Add(new RowDefinition(new GridLength(1, GridLengthType.Star)));
-            buttonsGrid.RowDefinitions.Add(new RowDefinition(new GridLength(1, GridLengthType.Star)));
-            buttonsGrid.ColumnDefinitions.Add(new ColumnDefinition(new GridLength(1, GridLengthType.Star)));
-            buttonsGrid.ColumnDefinitions.Add(new ColumnDefinition(new GridLength(1, GridLengthType.Star)));
-            buttonsGrid.ColumnDefinitions.Add(new ColumnDefinition(new GridLength(1, GridLengthType.Star)));
-            buttonsGrid.ColumnDefinitions.Add(new ColumnDefinition(new GridLength(1, GridLengthType.Star)));
-            mainGrid.Children.Add(buttonsGrid);
-            mainGrid.SetChildColumn(buttonsGrid, 0);
-            mainGrid.SetChildRow(buttonsGrid, 2);
+            _buttonsGrid.RowDefinitions.Add(new RowDefinition(new GridLength(1, GridLengthType.Star)));
+            _buttonsGrid.RowDefinitions.Add(new RowDefinition(new GridLength(1, GridLengthType.Star)));
+            _buttonsGrid.RowDefinitions.Add(new RowDefinition(new GridLength(1, GridLengthType.Star)));
+            _buttonsGrid.RowDefinitions.Add(new RowDefinition(new GridLength(1, GridLengthType.Star)));
+            _buttonsGrid.ColumnDefinitions.Add(new ColumnDefinition(new GridLength(1, GridLengthType.Star)));
+            _buttonsGrid.ColumnDefinitions.Add(new ColumnDefinition(new GridLength(1, GridLengthType.Star)));
+            _buttonsGrid.ColumnDefinitions.Add(new ColumnDefinition(new GridLength(1, GridLengthType.Star)));
+            _buttonsGrid.ColumnDefinitions.Add(new ColumnDefinition(new GridLength(1, GridLengthType.Star)));
+            _buttonsGrid.KeyPress += OnKeyPress;
+            mainGrid.Children.Add(_buttonsGrid);
+            mainGrid.SetChildColumn(_buttonsGrid, 0);
+            mainGrid.SetChildRow(_buttonsGrid, 2);
 
             string[] buttons = new[] { "7", "8", "9", "C", "4", "5", "6", "-", "1", "2", "3", "+", "±", "0", ".", "=" };
             int row = 0;
@@ -92,14 +98,32 @@ namespace Ztk.Demos.SampleApp
                         HorizontalAlignment = HorizontalAlignment.Stretch,
                         VerticalAlignment = VerticalAlignment.Stretch
                     };
-                    buttonsGrid.Children.Add(b);
-                    buttonsGrid.SetChildColumn(b, column);
-                    buttonsGrid.SetChildRow(b, row);
+                    _buttonsGrid.Children.Add(b);
+                    _buttonsGrid.SetChildColumn(b, column);
+                    _buttonsGrid.SetChildRow(b, row);
                     b.Click += CalculatorButtonOnClick;
+                    b.KeyPress += OnKeyPress;
                 }
                 column++;
             }
+            KeyPress += OnKeyPress;
 
+        }
+
+
+        private void OnKeyPress(object sender, KeyPressEventArgs e)
+        {
+            if ((e.Key == KeyboardKey.DUpper || e.Key == KeyboardKey.DLower) && e.KeyboardState.Modifiers.Length == 1 && e.KeyboardState.Modifiers[0] == KeyboardModifier.Control)
+                App.CurrentApplication.Shutdown();
+
+            string searchValue = e.Value;
+            if (e.Key == KeyboardKey.NumPadEnter || e.Key == KeyboardKey.Return)
+                searchValue = "=";
+            if (string.IsNullOrEmpty(searchValue))
+                return;
+            Button b = _buttonsGrid.Children.Cast<Button>().FirstOrDefault(btn => ((string)(btn.Content)) == searchValue);
+            if (b != null)
+                CalculatorButtonOnClick(b, new EventArgs());
         }
 
 

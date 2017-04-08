@@ -18,11 +18,27 @@ namespace Ztk
         /// </summary>
         private ShellSurface _surface;
 
+        private bool _isActivated;
+
         private readonly Queue<DateTime> _fpsQueue = new Queue<DateTime>();
 
         private DateTime _lastFpsOutput;
         #endregion
 
+        public bool IsActivated
+        {
+            get { return _isActivated; }
+            private set
+            {
+                if (value == _isActivated)
+                    return;
+                _isActivated = value;
+                if (value)
+                    Activate?.Invoke(this, new EventArgs());
+                else
+                    Deactivate?.Invoke(this, new EventArgs());
+            }
+        }
         internal bool FpsTrackingEnabled { get; set; }
 
         protected override FourSidedNumber InternalSpacing
@@ -53,6 +69,8 @@ namespace Ztk
 
         protected double Fps { get; private set; }
 
+        public event EventHandler Activate;
+        public event EventHandler Deactivate;
         #region Constructors
         /// <summary>
         /// Create a new instance of this class.
@@ -132,5 +150,16 @@ namespace Ztk
             if (LastPointerButtonEventArgs != null)
                 _surface.Move(LastPointerButtonEventArgs);
         }
+
+        internal void TriggerActivate()
+        {
+            IsActivated = true;
+        }
+
+        internal void TriggerDeactivate()
+        {
+            IsActivated = false;
+        }
+
     }
 }

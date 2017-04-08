@@ -7,6 +7,10 @@ namespace Ztk
     {
         private static Brush _backgroundBrush;
 
+        private static Brush _mouseOverBrush;
+
+        private bool _isMouseOver;
+
         private readonly ClickStateTracker _clickStateTracker;
 
         public object Content { get; set; }
@@ -15,13 +19,10 @@ namespace Ztk
 
         static Button()
         {
-            _backgroundBrush = new LinearGradientBrush(0.5, 0, 0.5, 1, new GradientStop[]
-            {
-                new GradientStop(new Color(0.8, 0.8, 0.8), 0),
-                new GradientStop(new Color(0.7, 0.7, 0.7), 0.5),
-                new GradientStop(new Color(0.8, 0.8, 0.8), 1),
-            });
+            _backgroundBrush = new SolidColorBrush(new Color(0x1F / 255f));
+            _mouseOverBrush = new SolidColorBrush(new Color(0x35/255f));
         }
+
 
         public event EventHandler Click;
         public event EventHandler DoubleClick;
@@ -34,6 +35,17 @@ namespace Ztk
             _clickStateTracker = new ClickStateTracker(this);
             _clickStateTracker.Click += OnClick;
             _clickStateTracker.DoubleClick += OnDoubleClick;
+            MouseEnter += OnMouseEnter;
+            MouseLeave += Button_MouseLeave;
+        }
+
+        private void Button_MouseLeave(object sender, EventArgs e)
+        {
+            _isMouseOver = false;
+        }
+        private void OnMouseEnter(object sender, EventArgs e)
+        {
+            _isMouseOver = true;
         }
 
         private void OnClick(object sender, EventArgs e)
@@ -76,7 +88,11 @@ namespace Ztk
         public override void Render(GraphicsContext g)
         {
             // First draw and fill our background
-            g.RoundedRect(0, 0, ActualWidth, ActualHeight, 5, _backgroundBrush, Brushes.Black, 2);
+            Brush brush = _isMouseOver ? _mouseOverBrush : _backgroundBrush;
+            g.Rectangle(0, 0, ActualWidth, ActualHeight);
+            brush.ApplyBrushToContext(g);
+            g.Fill();
+            //g.RoundedRect(0, 0, ActualWidth, ActualHeight, 5, brush, brush, 1);
 
             // Check we have text to draw
             string text = Content?.ToString();
@@ -84,11 +100,15 @@ namespace Ztk
                 return;
 
             // Now draw the text
-            Brushes.Black.ApplyBrushToContext(g);
+            Brushes.White.ApplyBrushToContext(g);
             g.SelectFontFace("Sans", FontSlant.Normal, FontWeight.Normal);
-            g.SetFontSize(14);
+            g.SetFontSize(32);
             TextExtents te = g.TextExtents(text);
-            g.MoveTo(3 + te.XBearing * -1 + Padding.Left, 3 + te.YBearing * -1 + Padding.Top);
+            double y = te.YBearing * -1 + Padding.Top;
+            double x = te.XBearing * -1 + Padding.Left;
+            double xRemaining = ActualWidth - Padding.Left - te.Width - Padding.Right;
+            double yRemaining = ActualHeight - Padding.Top - te.Height - Padding.Bottom;
+            g.MoveTo(x + (xRemaining / 2), y + (yRemaining / 2));
             g.ShowText(text);
         }
     }

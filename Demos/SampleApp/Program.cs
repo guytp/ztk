@@ -18,12 +18,9 @@ namespace Ztk.Demos.SampleApp
         }
     }
 
-    // TextBox
-    //    - If focussed have I-Bar
-
-    // use xdg shell
-    // Set window Title / class / etc.
     // Window Decorations (include maximise / full-screen) - configurable
+    // Set window Title / class / etc.
+    // use xdg shell
     // Window startup maximise/normal/full screen
     // Resize window
 
@@ -45,9 +42,13 @@ namespace Ztk.Demos.SampleApp
     // All UI components implement INotifyPropertyChanged
     // Implement a render is required / layout is required / only re-composite changed areas model - trigger renders required when any changes made to properties - store last used buffers (or just write alpha over?)
 
-    // Mouse events pass through transparent controls to those underneath - concept here of bubble up/down as with WPF
+    // Mouse events pass through transparent controls to those underneath - concept here of bubble up/down as with WPF.  Bubble up / down keyboard too?
 
     // Button content presenter?
+    // TextBlock wrap support
+    // TextBox
+    //    - If focussed have I-Bar
+    //    - Wrap
     // Image (via ImageBrush)
     // Radio Button
     // Check Box
@@ -60,5 +61,7 @@ namespace Ztk.Demos.SampleApp
     // MessageBox (can be popup)
     // Grid Row/Column Span
 
-    // Custom mouse cursors
+    // Custom mouse cursors (I bar for text boxces)
+
+    // Animations (Colour / Double)
 }

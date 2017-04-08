@@ -37,12 +37,16 @@
 namespace Ztk.Drawing {
 
 	public struct Color
-	{
-		public Color(double r, double g, double b) : this (r, g, b, 1.0)
-		{
-		}
+    {
+        public Color(double r, double g, double b) : this(r, g, b, 1.0)
+        {
+        }
+        public Color(double gray) : this(gray, gray, gray, 1.0)
+        {
+        }
 
-		public Color(double r, double g, double b, double a)
+
+        public Color(double r, double g, double b, double a)
 		{
 			this.r = r;
 			this.g = g;

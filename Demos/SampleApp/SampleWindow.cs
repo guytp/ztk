@@ -27,7 +27,7 @@ namespace Ztk.Demos.SampleApp
             mainGrid.KeyPress += OnKeyPress;
             mainGrid.MouseLeftButtonDown += OnLeftButtonDown;
             mainGrid.RowDefinitions.Add(new RowDefinition(new GridLength(30)));
-            mainGrid.RowDefinitions.Add(new RowDefinition(new GridLength()));
+            mainGrid.RowDefinitions.Add(new RowDefinition(new GridLength(45)));
             mainGrid.RowDefinitions.Add(new RowDefinition(new GridLength(1, GridLengthType.Star)));
             mainGrid.ColumnDefinitions.Add(new ColumnDefinition(new GridLength(1, GridLengthType.Star)));
 
@@ -64,6 +64,7 @@ namespace Ztk.Demos.SampleApp
             {
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 VerticalAlignment = VerticalAlignment.Stretch,
+                Background = new SolidColorBrush(new Color(0x1F / 255f))
             };
             _buttonsGrid.RowDefinitions.Add(new RowDefinition(new GridLength(1, GridLengthType.Star)));
             _buttonsGrid.RowDefinitions.Add(new RowDefinition(new GridLength(1, GridLengthType.Star)));
